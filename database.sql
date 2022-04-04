@@ -7,8 +7,7 @@ CREATE TABLE USERS
 	lastname VARCHAR(32) NOT NULL,
 	phone_number VARCHAR(32) NOT NULL,
 	email VARCHAR(32) NOT NULL,
-	password_hash VARCHAR(256) NOT NULL,
-	access_token VARCHAR(512) NOT NULL
+	password_hash VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE CONTACTS
