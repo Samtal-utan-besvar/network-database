@@ -1,0 +1,7 @@
+/.vs
+
+# Exclude all the keys
+keys/*
+
+# Exception to have a non-empty folder
+!keys/.gitkeep
