@@ -1,15 +1,31 @@
 ﻿const express = require('express');
 const app = express();
 
-// Load the routes
-const getRoutes = require('./routes/get')(app);
-const postRoutes = require('./routes/post')(app);
-const deleteRoutes = require('./routes/delete')(app);
-
-const port = 8080;
-
+// setup app
 app.use(express.json());
 
-app.listen(port, () => {
-    console.log("Server running on port: " + port);
+const routeManager = require('./routeManager')(app);
+const wsServer = require('ws').Server;
+const decoder = new TextDecoder("utf-8"); // decodes the arraybuffer into string
+process.env.ENV_VERBOSE = true;
+
+const httpPort = 8080;
+const wsPort = 4000;
+
+const ws = new wsServer({
+    port: wsPort
 });
+console.log("Server Listening on port: " + wsPort);
+
+// Load WS manager
+const wsManager = require('./websocket/wsManager')(ws);
+
+app.listen(httpPort, () => {
+    console.log("Server running on port: " + httpPort);
+});
+
+// MODULE EXPORTS
+
+module.exports.closeServer = function () {
+    ws.close();
+};
