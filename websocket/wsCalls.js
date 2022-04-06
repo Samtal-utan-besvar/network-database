@@ -20,8 +20,15 @@ function connect(conn, JSONMessage, clients) {
                                 'RESPONSE': 'Invalid User'
                             }));
                         } else {
+                            if (!result.rows[0]) {
+                                conn.send(JSON.stringify({
+                                    'RESPONSE': 'User Does Not Exist'
+                                }))
 
-                            // Add conenction, possibly replacing the old one.
+                                return; // End request
+                            }
+
+                            // Add connection, possibly replacing the old one.
                             clients[result.rows[0]['phone_number']] = {
                                 'CONNECTION': conn,
                                 'STATUS': 'free'
@@ -48,6 +55,15 @@ function connect(conn, JSONMessage, clients) {
 function call(conn, JSONMessage, clients) {
     var validRequest = true
 
+    // Check if verified client exists
+    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
+        }))
+
+        return; // End request
+    }
+
     // Check if users are already in a call
     if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'free' || clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != 'free' ) {
         conn.send(JSON.stringify({
@@ -70,6 +86,7 @@ function call(conn, JSONMessage, clients) {
     // Send message to the client with the phonenumber
     if (validRequest) {
         clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
+        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'calling'
 
         conn.send(JSON.stringify({
             'RESPONSE': 'Call Placed'
@@ -80,6 +97,15 @@ function call(conn, JSONMessage, clients) {
 }
 
 function callResponse(conn, JSONMessage, clients) {
+    // Check if verified client exists
+    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
+        }))
+
+        return; // End request
+    }
+
     // Validate if required fields are in the JSON
     var validRequest = validateJSONFields(JSONMessage, ['RESPONSE', 'TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
 
@@ -93,6 +119,15 @@ function callResponse(conn, JSONMessage, clients) {
             validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
     }
 
+    // Check if caller is calling
+    if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'calling') {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller is Missing Calling Status'
+        }))
+
+        return; // End request
+    }
+
     // Send message to the client with the phonenumber
     if (validRequest) {
         clients[JSONMessage['CALLER_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
@@ -101,16 +136,48 @@ function callResponse(conn, JSONMessage, clients) {
             'RESPONSE': 'Call Answer Sent'
         }))
 
+        // Set status to other clients phone number
+        if (JSONMessage['RESPONSE'] == 'accept') {
+            clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = JSONMessage['CALLER_PHONE_NUMBER']
+            clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = JSONMessage['TARGET_PHONE_NUMBER']
+        }
         if (process.env.ENV_VERBOSE) console.log("COMMON: " + JSONMessage['TARGET_PHONE_NUMBER'] + " Answered " + JSONMessage['CALLER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
     }
 }
 
 function ICECandidate(conn, JSONMessage, clients) {
+    // Check if verified client exists
+    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
+        }))
+
+        return; // End request
+    }
+
+    if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['CALLER_PHONE_NUMBER']]['PHONE_NUMBER'] ||
+        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['TARGET_PHONE_NUMBER']]['PHONE_NUMBER']) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not in an Active Call'
+        }))
+
+        return; // End request
+    }
+
     // Send message to the client with the phonenumber
     clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
 }
 
 function hangUp(conn, JSONMessage, clients) {
+    // Check if verified client exists
+    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
+        }))
+
+        return; // End request
+    }
+
     // Validate if required fields are in the JSON
     var validRequest = validateJSONFields(JSONMessage, ['TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
 
@@ -120,15 +187,42 @@ function hangUp(conn, JSONMessage, clients) {
             validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
     }
 
+    if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['CALLER_PHONE_NUMBER']]['PHONE_NUMBER'] ||
+        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['TARGET_PHONE_NUMBER']]['PHONE_NUMBER']) {
+        conn.send(JSON.stringify({
+            'RESPONSE': 'Caller or Contact Is Not in an Active Call'
+        }))
+
+        return; // End request
+    }
+
     // Send message to the client with the phonenumber
     if (validRequest) {
         clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
-
+        
         conn.send(JSON.stringify({
             'RESPONSE': 'Call Hang Up Sent'
         }))
 
+        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'free'
+        clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = 'free'
+
         if (process.env.ENV_VERBOSE) console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Hung Up On " + JSONMessage['TARGET_PHONE_NUMBER']);
+    }
+}
+
+function removeClient(conn, clients) {
+    for (const [key, value] of Object.entries(clients)) {
+        if (clients[key]['CONNECTION'] == conn) {
+            if (process.env.ENV_VERBOSE) console.log("COMMON: Remove Client");
+
+            // Set status for potantial user that has active call with user
+            if (clients[clients[key]['STATUS']]) {
+                clients[clients[key]['STATUS']]['STATUS'] = 'free';
+            }
+
+            delete clients[key];
+        }
     }
 }
 
@@ -137,3 +231,4 @@ module.exports.call = call;
 module.exports.callResponse = callResponse;
 module.exports.ICECandidate = ICECandidate;
 module.exports.hangUp = hangUp;
+module.exports.removeClient = removeClient;
