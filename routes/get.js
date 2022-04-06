@@ -1,10 +1,18 @@
 ﻿const authenticateModule = require('../jwt/jwtAuth');
 const authenticateToken = authenticateModule.authenticateToken;
 const generateAccessToken = authenticateModule.generateAccessToken;
+const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
 const pool = require('../db');
 
 function authenticate(req, res, next) {
     try {
+        if (!verifyNoneEmpty(req.body)) {
+            if (process.env.ENV_VERBOSE) console.log("WARNING: Empty values found in request!");
+            res.status(422).send("Empty Fields in Request");
+
+            return;
+        }
+
         const newPayload = {
             'email': req.user.email
         }
@@ -19,6 +27,13 @@ function authenticate(req, res, next) {
 //Get Users Contact List
 function getContactList(req, res, next) {
     try {
+        if (!verifyNoneEmpty(req.body)) {
+            if (process.env.ENV_VERBOSE) console.log("WARNING: Empty values found in request!");
+            res.status(422).send("Empty Fields in Request");
+
+            return;
+        }
+
         pool.query(
             `SELECT u.phone_number, u.firstname, u.lastname 
                 FROM CONTACTS c 

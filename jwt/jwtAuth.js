@@ -17,6 +17,7 @@ try {
     tokenSecret.pop();
     tokenSecret = tokenSecret.join('\n');
 } catch (err) {
+    console.log("ERROR: Missing key for token secret, please add one!");
     console.error(err)
 }
 

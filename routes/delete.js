@@ -1,9 +1,17 @@
 ﻿const authenticateModule = require('../jwt/jwtAuth');
 const authenticateToken = authenticateModule.authenticateToken;
+const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
 const pool = require('../db');
 
 function deleteContact (req, res, next) {
     try {
+        if (!verifyNoneEmpty(req.body)) {
+            if (process.env.ENV_VERBOSE) console.log("WARNING: Empty values found in request!");
+            res.status(422).send("Empty Fields in Request");
+
+            return;
+        }
+
         const { contact_phonenumber } = req.body;
 
         pool.query(
