@@ -8,11 +8,11 @@ NodeJS, NPM and PostgreSQL are the required dependecies you need to run this pro
 ### Installation on Linux (apt, wget)
 NodeJS: ```sudo apt install nodejs```\
 NPM: ```sudo apt install npm```\
-PostgreSQL:\
-```sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'```\
-```wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -```\
-```sudo apt-get update```\
-```sudo apt-get -y install postgresql```\
+PostgreSQL:
+* ```sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'```
+* ```wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -```
+* ```sudo apt-get update```
+* ```sudo apt-get -y install postgresql```
 OpenSSL: https://github.com/openssl/openssl/blob/master/INSTALL.md#installing-openssl (Optional) 
 
 ### Installation on Windows
@@ -21,17 +21,17 @@ PostgreSQL: https://www.postgresql.org/download/windows/ \
 OpenSSL: https://slproweb.com/products/Win32OpenSSL.html (Optional)
 
 ### Setup
-Once the required dependencies are installed you need to generate a SHA-256 key in the ./keys folder with the name of ""tokenSecret.key"". This can be done using OpenSSL with the command ```openssl genrsa -out tokenSecret.key 4096``` while in the keys folder.
+Once the required dependencies are installed you need to generate a SHA-256 key in the ./keys folder with the name of *tokenSecret.key*. This can be done using OpenSSL with the command ```openssl genrsa -out tokenSecret.key 4096``` while in the keys folder.
 
-To generate the required database use the database.sql file containgin the two schemas used for the user and contact table. This can be done while connected to the database with the correct user privileges.
+To generate the required database use the database.sql file containing the two schemas used for the user and contact table. This can be done while connected to the database with the correct user privileges.
 
-When you have a key and the database is setup simply type ```npm start``` to start the servers or ```npm test``` to run the tests. The launch variables and dependencies can be changed in ""package.json"".
+When you have a key and the database is setup simply type ```npm start``` to start the servers or ```npm test``` to run the tests. The launch variables and dependencies can be changed in *package.json*.
 
 ## Server Communication
-To use the database and signal server, HTTP and websocket clients are required. It's highly recommended to use ""Postman"" to manually test the HTTP and websocket requests. Both servers use JSON as the dataformat to be sent and received.
+To use the database and signal server, HTTP and websocket clients are required. It's highly recommended to use *Postman* to manually test the HTTP and websocket requests. Both servers use JSON as the dataformat to be sent and received.
 
-### Databaseserver Communication
-#### Create a User: ""http://your_adress:8080/create_user""
+### <ins>Databaseserver Communication</ins>
+#### Create a User: *http://your_adress:8080/create_user*
 ```
 {
     "firstname": "First",
@@ -42,7 +42,7 @@ To use the database and signal server, HTTP and websocket clients are required. 
 }
 ```
 ***
-#### Login a User: ""http://your_adress:8080/login""
+#### Login a User: *http://your_adress:8080/login*
 ```
 {
     "email": "somenice@domain.yup",
@@ -51,14 +51,14 @@ To use the database and signal server, HTTP and websocket clients are required. 
 ```
 * Returns JWT token for future verification
 ***
-#### Authenticate a User: ""http://your_adress:8080/authenticate""
+#### Authenticate a User: *http://your_adress:8080/authenticate*
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
 * Returns JWT token for future verification
 ***
-#### Add a Contact: ""http://your_adress:8080/add_contact""
+#### Add a Contact: *http://your_adress:8080/add_contact*
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -66,13 +66,13 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Get Contacts: ""http://your_adress:8080/get_contacts""
+#### Get Contacts: *http://your_adress:8080/get_contacts*
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
 ***
-#### Delete Contact: ""http://your_adress:8080/delete_contact""
+#### Delete Contact: *http://your_adress:8080/delete_contact*
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -83,8 +83,8 @@ Header (authorization): *(User's JWT token)*
 
 &nbsp;
 
-### Signalserver Communication
-#### Connect: ""ws://your_adress:4000""
+### <ins>Signalserver Communication</ins>
+#### Connect: *ws://your_adress:4000*
 ```
 {
     "REASON": "connect",
@@ -92,7 +92,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Call: ""ws://your_adress:4000""
+#### Call: *ws://your_adress:4000*
 ```
 {
     "REASON": "call",
@@ -102,7 +102,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Call Response: ""ws://your_adress:4000""
+#### Call Response: *ws://your_adress:4000*
 ```
 {
     "REASON": "callResponse",
@@ -113,7 +113,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Send ICE Candidate: ""ws://your_adress:4000""
+#### Send ICE Candidate: *ws://your_adress:4000*
 ```
 {
     "REASON": "ICECandidate",
@@ -122,7 +122,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Hang Up: ""ws://your_adress:4000""
+#### Hang Up: *ws://your_adress:4000*
 ```
 {
     "REASON": "HangUp",
