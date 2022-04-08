@@ -79,20 +79,39 @@ function createUser(req, res, next) {
             });
         }
 
-        function addUser(resolve, reject) {
-            const access_token = generateAccessToken({ 'email': email });
+        // Querry database to add user
+        const addUser = () => {
+            return new Promise((resolve, reject) => {
 
-            // Salt is 72-Bytes, no use in storing on database
-            bcrypt.genSalt(saltRounds, function (err, salt) {
-                bcrypt.hash(password, salt, function (err, hash) {
-                    pool.query(
-                        `INSERT INTO USERS (firstname, lastname, phone_number, email, password_hash) 
+                // Salt and hash password
+                bcrypt.genSalt(saltRounds, function (err, salt) {
+                    bcrypt.hash(password, salt, function (err, hash) {
+                        pool.query(
+                            `INSERT INTO USERS (firstname, lastname, phone_number, email, password_hash) 
                             VALUES($1, $2, $3, $4, $5)`,
-                        [firstname, lastname, phone_number, email, hash]
-                    );
-                });
-            });
+                            [firstname, lastname, phone_number, email, hash], (err, result) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
 
+                                if (result.rowCount != 1) {
+                                    var error = new Error('Error Adding User');
+                                    error.name = 'Defined';
+                                    reject(error);
+                                    return;
+                                }
+
+                                resolve();
+                            }
+                        );
+                    });
+                });
+            })
+        }
+
+        function returnAccessToken() {
+            const access_token = generateAccessToken({ 'email': email });
             res.json(access_token);
         }
         
@@ -102,6 +121,12 @@ function createUser(req, res, next) {
                 checkPhoneNumber()
                     .then(data => {
                         addUser()
+                            .then(data => {
+                                returnAccessToken();
+                        })
+                        .catch(err => {
+                            handleError(err, res);
+                        })
                     })
                     .catch(err => {
                         handleError(err, res);
@@ -215,7 +240,6 @@ function addContact(req, res, next) {
                             return;
                         }
 
-                        console.log(result);
                         if (result.rowCount != 1) {
                             var error = new Error('Unknown Phone Number Or User Already A Contact');
                             error.name = 'Defined';

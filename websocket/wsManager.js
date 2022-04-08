@@ -9,7 +9,7 @@ var clients = {};
 
 function wsManager(ws) {
     ws.on('connection', (conn) => {
-        if (process.env.ENV_VERBOSE) console.log("COMMON: New WS/WSS Connection.");
+        if (process.env.ENV_VERBOSE == true) console.log("COMMON: New WS/WSS Connection.");
 
         conn.on('message', (message) => {
             var JSONMessage;
@@ -35,7 +35,7 @@ function wsManager(ws) {
         });
 
         conn.on('close', function () {
-            if (process.env.ENV_VERBOSE) console.log("COMMON: WS/WSS Disconnected.");
+            if (process.env.ENV_VERBOSE == true) console.log("COMMON: WS/WSS Disconnected.");
 
             removeClient(conn, clients);
         });

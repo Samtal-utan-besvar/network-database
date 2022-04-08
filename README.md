@@ -119,6 +119,7 @@ Header (authorization): *(User's JWT token)*
 {
     "REASON": "ICECandidate",
     "TARGET_PHONE_NUMBER": "1212121212",
+    "ORIGIN_PHONE_NUMBER": "1234567890"
     "CANDIDATE": "ICE Candidate"
 }
 ```

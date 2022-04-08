@@ -6,8 +6,6 @@ app.use(express.json());
 
 const routeManager = require('./routeManager')(app);
 const wsServer = require('ws').Server;
-const decoder = new TextDecoder("utf-8"); // decodes the arraybuffer into string
-process.env.ENV_VERBOSE = true;
 
 const httpPort = 8080;
 const wsPort = 4000;
@@ -29,3 +27,5 @@ app.listen(httpPort, () => {
 module.exports.closeServer = function () {
     ws.close();
 };
+
+module.exports.httpServer = app;
