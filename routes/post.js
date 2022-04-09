@@ -182,15 +182,14 @@ function login(req, res, next) {
                         bcrypt.compare(password, result.rows[0].password_hash, (err, result) => {
                             if (result) {
                                 res.json(generateAccessToken({ 'email': email }));
+                                resolve();
                             } else {
-                                var error = new Error('Wrong Login Credentials');
-                                error.name = 'Defined';
+                                var err = new Error('Wrong Login Credentials');
+                                err.name = 'Defined';
                                 reject(err);
                                 return;
                             }
                         });
-
-                        resolve();
                     }
                 );
             });

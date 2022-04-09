@@ -77,7 +77,6 @@ Header (authorization): *(User's JWT token)*
 Header (authorization): *(User's JWT token)*
 ```
 {
-    "owner_phonenumber": "1234567890",
     "contact_phonenumber": "1212121212"
 }
 ```

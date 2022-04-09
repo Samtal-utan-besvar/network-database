@@ -2,10 +2,10 @@
   "name": "network-database",
   "version": "1.0.0",
   "description": "database server",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "nodemon main.js",
-    "test": "mocha ./tests/wsTest.js"
+    "test": "mocha -r config.env ./tests/testManager.js --exit"
   },
   "repository": {
     "type": "git",

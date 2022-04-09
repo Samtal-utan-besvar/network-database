@@ -15,7 +15,7 @@ function deleteContact (req, res, next) {
         }
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 2)) {
+        if (!sanitize(req.body, dataLimit, 1)) {
             var error = new Error('Illegal Request');
             error.name = 'Defined';
             throw error;

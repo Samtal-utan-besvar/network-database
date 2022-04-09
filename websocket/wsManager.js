@@ -1,3 +1,4 @@
+require('dotenv').config({ path: './config.env' });
 const connect = require('./wsCalls').connect;
 const call = require('./wsCalls').call;
 const callResponse = require('./wsCalls').callResponse;
@@ -9,7 +10,7 @@ var clients = {};
 
 function wsManager(ws) {
     ws.on('connection', (conn) => {
-        if (process.env.ENV_VERBOSE == true) console.log("COMMON: New WS/WSS Connection.");
+        if (process.env.VERBOSE == true) console.log("COMMON: New WS/WSS Connection.");
 
         conn.on('message', (message) => {
             var JSONMessage;
@@ -35,7 +36,7 @@ function wsManager(ws) {
         });
 
         conn.on('close', function () {
-            if (process.env.ENV_VERBOSE == true) console.log("COMMON: WS/WSS Disconnected.");
+            if (process.env.VERBOSE == true) console.log("COMMON: WS/WSS Disconnected.");
 
             removeClient(conn, clients);
         });
