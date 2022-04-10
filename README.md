@@ -77,7 +77,6 @@ Header (authorization): *(User's JWT token)*
 Header (authorization): *(User's JWT token)*
 ```
 {
-    "owner_phonenumber": "1234567890",
     "contact_phonenumber": "1212121212"
 }
 ```
@@ -119,6 +118,7 @@ Header (authorization): *(User's JWT token)*
 {
     "REASON": "ICECandidate",
     "TARGET_PHONE_NUMBER": "1212121212",
+    "ORIGIN_PHONE_NUMBER": "1234567890"
     "CANDIDATE": "ICE Candidate"
 }
 ```

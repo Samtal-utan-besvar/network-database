@@ -1,11 +1,12 @@
+const handleError = require('../routes/routeValidity').handleError;
+
 // Validate JSON fields inclusion
 function validateJSONFields(json, expectFields, connection) {
     for (const field of expectFields) {
         if (!json.hasOwnProperty(field)) {
-            connection.send(JSON.stringify({
-                'ERROR': 'Field Missing',
-                'FIELD': String(field)
-            }))
+            var error = new Error('Missin Field: ' + String(field));
+            error.name = 'Defined';
+            throw error;
 
             return false
         }
@@ -24,10 +25,9 @@ function validatePhonenumber(phonenumber, connection) {
 
     // warn client of invalid phonenumber
     if (!valid) {
-        connection.send(JSON.stringify({
-            'ERROR': 'Invalid Phonenumber',
-            'PHONENUMBER': String(phonenumber)
-        }))
+        var error = new Error('Invalid Phonenumber: ' + String(phonenumber));
+        error.name = 'Defined';
+        throw error;
     }
 
     return valid;
@@ -43,10 +43,9 @@ function validateEmail(email, connection) {
 
     // warn client of invalid email
     if (!valid) {
-        connection.send(JSON.stringify({
-            'ERROR': 'Invalid Email',
-            'EMAIL': String(email)
-        }))
+        var error = new Error('Invalid Email: ' + String(email));
+        error.name = 'Defined';
+        throw error;
     }
 
     return valid;
@@ -62,10 +61,9 @@ function validateName(name, connection) {
 
     // warn client of invalid name
     if (!valid) {
-        connection.send(JSON.stringify({
-            'ERROR': 'Invalid Name',
-            'NAME': String(name)
-        }))
+        var error = new Error('Invalid Name: ' + String(name));
+        error.name = 'Defined';
+        throw error;
     }
 
     return valid;
