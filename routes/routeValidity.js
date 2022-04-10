@@ -1,3 +1,5 @@
+require('dotenv').config({ path: './config.env' });
+
 // Check if fields in json are empty
 function verifyNoneEmpty(request) {
     for (entry in request) {
@@ -24,7 +26,7 @@ function sanitize(request, dataLimit, expectedFieldAmount) {
 
 // Propperly handle the erros caused during a request
 function handleError(err, res) {
-    if (process.env.ENV_VERBOSE) console.log('WARNING: ' + err.message);
+    if (process.env.VERBOSE == true) console.log('WARNING: ' + err.message);
 
     // Only return errors with 'Defined' as to not leak database or critical errors
     if (err.name == 'Defined') {

@@ -2,9 +2,10 @@
   "name": "network-database",
   "version": "1.0.0",
   "description": "database server",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "nodemon main.js"
+    "start": "nodemon main.js",
+    "test": "mocha -r config.env ./tests/testManager.js --exit"
   },
   "repository": {
     "type": "git",
@@ -14,6 +15,9 @@
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.3",

@@ -1,4 +1,5 @@
 CREATE DATABASE user_database;
+CREATE DATABASE test_user_database;
 
 CREATE TABLE USERS
 (

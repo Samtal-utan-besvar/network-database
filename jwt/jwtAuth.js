@@ -49,13 +49,17 @@ function authenticateToken(req, res, next) {
 
 // Asynchronous
 function authenticateWsToken(token, callback) {
-    if (token == null) return false
+    if (token == null) {
+        var err = new Error('Empty JWT Tken');
+        err.name = 'Defined';
+        throw err;
+    }
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
         if (err) {
-            console.log(err)
-
-            return false;
+            var err = new Error('Invalid JWT Token');
+            err.name = 'Defined';
+            throw err;
         }
 
         callback(user.email);

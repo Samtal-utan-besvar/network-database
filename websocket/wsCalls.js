@@ -1,8 +1,10 @@
-﻿const jwtAuth = require('../jwt/jwtAuth');
+﻿require('dotenv').config({ path: './config.env' });
+const jwtAuth = require('../jwt/jwtAuth');
 const validateJSONFields = require('./wsHelpers').validateJSONFields;
 const validateEmail = require('./wsHelpers').validateEmail;
 const validatePhonenumber = require('./wsHelpers').validatePhonenumber;
 const validateName = require('./wsHelpers').validateName;
+const handleError = require('../routes/routeValidity').handleError;
 const pool = require('../db');
 
 // Asynchronous connect function
@@ -16,14 +18,14 @@ function connect(conn, JSONMessage, clients) {
                     `SELECT phone_number FROM USERS WHERE email = $1`,
                     [email], (err, result) => {
                         if (err) {
-                            conn.send(JSON.stringify({
-                                'RESPONSE': 'Invalid User'
-                            }));
+                            var error = new Error('Invalid User');
+                            error.name = 'Defined';
+                            throw error;
                         } else {
                             if (!result.rows[0]) {
-                                conn.send(JSON.stringify({
-                                    'RESPONSE': 'User Does Not Exist'
-                                }))
+                                var error = new Error('User Does not Exist');
+                                error.name = 'Defined';
+                                throw error;
 
                                 return; // End request
                             }
@@ -38,15 +40,12 @@ function connect(conn, JSONMessage, clients) {
                                 'RESPONSE': 'Connected'
                             }))
 
-                            if (process.env.ENV_VERBOSE) console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
+                            if (process.env.VERBOSE == true) console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
                         }
                     }
                 );
             } catch (err) {
-                console.log(err.message);
-                conn.send(JSON.stringify({
-                    'RESPONSE': 'Error'
-                }));
+                handleError(err);
             }
         }
     });
@@ -55,166 +54,184 @@ function connect(conn, JSONMessage, clients) {
 function call(conn, JSONMessage, clients) {
     var validRequest = true
 
-    // Check if verified client exists
-    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
-        }))
+    try {
+        // Check if verified client exists
+        if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+            var error = new Error('Caller or Contact Is Not a Verified Active Connection');
+            error.name = 'Defined';
+            throw error;
 
-        return; // End request
-    }
+            return; // End request
+        }
 
-    // Check if users are already in a call
-    if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'free' || clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != 'free' ) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'User Not Free'
-        }))
+        // Check if users are already in a call
+        if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'free' || clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != 'free') {
+            var error = new Error('User Not Free');
+            error.name = 'Defined';
+            throw error;
 
-        validRequest = false;
-    }
+            validRequest = false;
+        }
 
-    // Validate if required fields are in the JSON
-    if (validRequest) {
-        validRequest = validateJSONFields(JSONMessage, ['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER', 'SDP'], conn);
-    }
+        // Validate if required fields are in the JSON
+        if (validRequest) {
+            validRequest = validateJSONFields(JSONMessage, ['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER', 'SDP'], conn);
+        }
 
-    // Validate phonenumber with RegEx, send back error if failed
-    if (validRequest) {
-        validRequest = validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER'], conn);
-    }
+        // Validate phonenumber with RegEx, send back error if failed
+        if (validRequest) {
+            validRequest = validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER'], conn);
+        }
 
-    // Send message to the client with the phonenumber
-    if (validRequest) {
-        clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
-        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'calling'
+        // Send message to the client with the phonenumber
+        if (validRequest) {
+            clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
+            clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'calling'
 
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Call Placed'
-        }))
+            conn.send(JSON.stringify({
+                'RESPONSE': 'Call Placed'
+            }))
 
-        if (process.env.ENV_VERBOSE) console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Is Calling " + JSONMessage['TARGET_PHONE_NUMBER'] + ".");
-    }
+            if (process.env.VERBOSE == true) console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Is Calling " + JSONMessage['TARGET_PHONE_NUMBER'] + ".");
+        }
+    } catch (err) {
+        handleError(err);
+    }   
 }
 
 function callResponse(conn, JSONMessage, clients) {
-    // Check if verified client exists
-    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
-        }))
+    try {
+        // Check if verified client exists
+        if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+            var error = new Error('Caller or Contact Is Not a Verified Active Connection');
+            error.name = 'Defined';
+            throw error;
 
-        return; // End request
-    }
-
-    // Validate if required fields are in the JSON
-    var validRequest = validateJSONFields(JSONMessage, ['RESPONSE', 'TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
-
-    if (validRequest && JSONMessage['RESPONSE'] == 'accept') {
-        validRequest = validateJSONFields(JSONMessage, ['SDP'], conn);
-    }
-
-    // Validate phonenumber with RegEx, send back error if failed
-    if (validRequest) {
-        validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
-            validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
-    }
-
-    // Check if caller is calling
-    if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'calling') {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller is Missing Calling Status'
-        }))
-
-        return; // End request
-    }
-
-    // Send message to the client with the phonenumber
-    if (validRequest) {
-        clients[JSONMessage['CALLER_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
-
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Call Answer Sent'
-        }))
-
-        // Set status to other clients phone number
-        if (JSONMessage['RESPONSE'] == 'accept') {
-            clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = JSONMessage['CALLER_PHONE_NUMBER']
-            clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = JSONMessage['TARGET_PHONE_NUMBER']
+            return; // End request
         }
-        if (process.env.ENV_VERBOSE) console.log("COMMON: " + JSONMessage['TARGET_PHONE_NUMBER'] + " Answered " + JSONMessage['CALLER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
+
+        // Validate if required fields are in the JSON
+        var validRequest = validateJSONFields(JSONMessage, ['RESPONSE', 'TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
+
+        if (validRequest && JSONMessage['RESPONSE'] == 'accept') {
+            validRequest = validateJSONFields(JSONMessage, ['SDP'], conn);
+        }
+
+        // Validate phonenumber with RegEx, send back error if failed
+        if (validRequest) {
+            validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
+                validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
+        }
+
+        // Check if caller is calling
+        if (clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != 'calling') {
+            var error = new Error('Caller is Missing Calling Status');
+            error.name = 'Defined';
+            throw error;
+
+            return; // End request
+        }
+
+        // Send message to the client with the phonenumber
+        if (validRequest) {
+            clients[JSONMessage['CALLER_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
+
+            conn.send(JSON.stringify({
+                'RESPONSE': 'Call Answer Sent'
+            }))
+
+            // Set status to other clients phone number
+            if (JSONMessage['RESPONSE'] == 'accept') {
+                clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = JSONMessage['CALLER_PHONE_NUMBER']
+                clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = JSONMessage['TARGET_PHONE_NUMBER']
+            }
+            if (process.env.VERBOSE == true) console.log("COMMON: " + JSONMessage['TARGET_PHONE_NUMBER'] + " Answered " + JSONMessage['CALLER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
+        }
+    } catch (err) {
+        handleError(err);
     }
 }
 
 function ICECandidate(conn, JSONMessage, clients) {
-    // Check if verified client exists
-    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
-        }))
+    try {
+        // Check if verified client exists
+        if (!(clients[JSONMessage['ORIGIN_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+            var error = new Error('Caller or Contact Is Not a Verified Active Connection');
+            error.name = 'Defined';
+            throw error;
 
-        return; // End request
+            return; // End request
+        }
+
+        if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != JSONMessage['ORIGIN_PHONE_NUMBER'] ||
+            clients[JSONMessage['ORIGIN_PHONE_NUMBER']]['STATUS'] != JSONMessage['TARGET_PHONE_NUMBER']) {
+            var error = new Error('Caller or Contact Is Not in an Active Call');
+            error.name = 'Defined';
+            throw error;
+
+            return; // End request
+        }
+
+        // Send message to the client with the phonenumber
+        clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
+    } catch (err) {
+        handleError(err);
     }
-
-    if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['CALLER_PHONE_NUMBER']]['PHONE_NUMBER'] ||
-        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['TARGET_PHONE_NUMBER']]['PHONE_NUMBER']) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not in an Active Call'
-        }))
-
-        return; // End request
-    }
-
-    // Send message to the client with the phonenumber
-    clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
 }
 
 function hangUp(conn, JSONMessage, clients) {
-    // Check if verified client exists
-    if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not a Verified Active Connection'
-        }))
+    try {
+        // Check if verified client exists
+        if (!(clients[JSONMessage['CALLER_PHONE_NUMBER']] && clients[JSONMessage['TARGET_PHONE_NUMBER']])) {
+            var error = new Error('Caller or Contact Is Not a Verified Active Connection');
+            error.name = 'Defined';
+            throw error;
 
-        return; // End request
-    }
+            return; // End request
+        }
 
-    // Validate if required fields are in the JSON
-    var validRequest = validateJSONFields(JSONMessage, ['TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
+        // Validate if required fields are in the JSON
+        var validRequest = validateJSONFields(JSONMessage, ['TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
 
-    // Validate phonenumber with RegEx, send back error if failed
-    if (validRequest) {
-        validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
-            validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
-    }
+        // Validate phonenumber with RegEx, send back error if failed
+        if (validRequest) {
+            validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
+                validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
+        }
 
-    if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['CALLER_PHONE_NUMBER']]['PHONE_NUMBER'] ||
-        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != clients[JSONMessage['TARGET_PHONE_NUMBER']]['PHONE_NUMBER']) {
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Caller or Contact Is Not in an Active Call'
-        }))
+        if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != JSONMessage['CALLER_PHONE_NUMBER'] ||
+            clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] != JSONMessage['TARGET_PHONE_NUMBER']) {
+            var error = new Error('Caller or Contact Is Not in an Active Call');
+            error.name = 'Defined';
+            throw error;
 
-        return; // End request
-    }
+            return; // End request
+        }
 
-    // Send message to the client with the phonenumber
-    if (validRequest) {
-        clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
-        
-        conn.send(JSON.stringify({
-            'RESPONSE': 'Call Hang Up Sent'
-        }))
+        // Send message to the client with the phonenumber
+        if (validRequest) {
+            clients[JSONMessage['TARGET_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
 
-        clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'free'
-        clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = 'free'
+            conn.send(JSON.stringify({
+                'RESPONSE': 'Call Hang Up Sent'
+            }))
 
-        if (process.env.ENV_VERBOSE) console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Hung Up On " + JSONMessage['TARGET_PHONE_NUMBER']);
+            clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'free'
+            clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = 'free'
+
+            if (process.env.VERBOSE == true) {
+                console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Hung Up On " + JSONMessage['TARGET_PHONE_NUMBER']);
+            }
+        }
+    } catch (err) {
+        handleError(err);
     }
 }
 
 function removeClient(conn, clients) {
     for (const [key, value] of Object.entries(clients)) {
         if (clients[key]['CONNECTION'] == conn) {
-            if (process.env.ENV_VERBOSE) console.log("COMMON: Remove Client");
+            if (process.env.VERBOSE == true) console.log("COMMON: Remove Client");
 
             // Set status for potantial user that has active call with user
             if (clients[clients[key]['STATUS']]) {
