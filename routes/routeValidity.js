@@ -29,9 +29,9 @@ function handleError(err, res) {
     if (process.env.VERBOSE == true) console.log('WARNING: ' + err.message);
 
     // Only return errors with 'Defined' as to not leak database or critical errors
-    if (err.name == 'Defined') {
+    if (err.name == 'Defined' && res) {
         res.status(422).send(err.message);
-    } else {
+    } else if(res) {
         res.status(422).send('Looks like something went wrong... we\'re sorry!');
     }
 }
