@@ -9,46 +9,50 @@ const pool = require('../db');
 
 // Asynchronous connect function
 function connect(conn, JSONMessage, clients) {
-    jwtAuth.authenticateWsToken(JSONMessage['TOKEN'], function (email) {
+    try {
+        jwtAuth.authenticateWsToken(JSONMessage['TOKEN'], function (email) {
 
-        // Add client and send response if valid request
-        if (validateEmail(email, conn)) {
-            try {
-                pool.query(
-                    `SELECT phone_number FROM USERS WHERE email = $1`,
-                    [email], (err, result) => {
-                        if (err) {
-                            var error = new Error('Invalid User');
-                            error.name = 'Defined';
-                            throw error;
-                        } else {
-                            if (!result.rows[0]) {
-                                var error = new Error('User Does not Exist');
-                                error.name = 'Defined';
-                                throw error;
+            // Add client and send response if valid request
+            if (validateEmail(email, conn)) {
+                    pool.query(
+                        `SELECT phone_number FROM USERS WHERE email = $1`,
+                        [email], (err, result) => {
+                            try {
+                                if (err) {
+                                    var error = new Error('Invalid User');
+                                    error.name = 'Defined';
+                                    throw error;
+                                } else {
+                                    if (!result.rows[0]) {
+                                        var error = new Error('User Does not Exist');
+                                        error.name = 'Defined';
+                                        throw error;
 
-                                return; // End request
+                                        return; // End request
+                                    }
+
+                                    // Add connection, possibly replacing the old one.
+                                    clients[result.rows[0]['phone_number']] = {
+                                        'CONNECTION': conn,
+                                        'STATUS': 'free'
+                                    };
+
+                                    conn.send(JSON.stringify({
+                                        'RESPONSE': 'Connected'
+                                    }))
+
+                                    if (process.env.VERBOSE == true) console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
+                                }
+                            } catch (err) {
+                                handleError(err);
                             }
-
-                            // Add connection, possibly replacing the old one.
-                            clients[result.rows[0]['phone_number']] = {
-                                'CONNECTION': conn,
-                                'STATUS': 'free'
-                            };
-
-                            conn.send(JSON.stringify({
-                                'RESPONSE': 'Connected'
-                            }))
-
-                            if (process.env.VERBOSE == true) console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
                         }
-                    }
-                );
-            } catch (err) {
-                handleError(err);
+                    );
             }
-        }
-    });
+        });
+    } catch (err) {
+        handleError(err);
+    }
 }
 
 function call(conn, JSONMessage, clients) {
