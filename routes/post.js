@@ -3,7 +3,7 @@ const generateAccessToken = authenticateModule.generateAccessToken;
 const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
 const sanitize = require('./routeValidity').sanitize;
 const handleError = require('./routeValidity').handleError;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const pool = require('../db');
 
 const saltRounds = 10;
