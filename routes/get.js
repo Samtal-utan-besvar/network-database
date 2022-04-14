@@ -82,5 +82,69 @@ function getContactList(req, res, next) {
     }
 }
 
+
+
+
+
+
+
+//
+//
+//      THIS IS A DEVELOPMENT FUNCTION
+//      DO NOT PUT THIS IN PRODUCTION!!!!!
+//
+
+
+
+
+
+function getUsers(req, res, next) {
+    try {
+        // Check so no values are empty
+        if (!verifyNoneEmpty(req.body)) {
+            var error = new Error('Empty Fields in Request');
+            error.name = 'Defined';
+            throw error;
+        }
+
+        // Check if request meets sanitize requirements (field amount, data size)
+        if (!sanitize(req.body, dataLimit, 0)) {
+            var error = new Error('Illegal Request');
+            error.name = 'Defined';
+            throw error;
+        }
+
+        // Request all contacts (Async)
+        const requestUsers = () => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `SELECT * 
+                        FROM users`,
+                    [], (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        } else {
+                            resolve(result.rows);
+                        }
+                    }
+                );
+            });
+        }
+
+        requestUsers()
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                handleError(err, res);
+            })
+
+    } catch (err) {
+        handleError(err, res);
+    }
+}
+
 module.exports.authenticate = authenticate;
 module.exports.getContactList = getContactList;
+module.exports.getUsers = getUsers;

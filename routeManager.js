@@ -11,6 +11,7 @@ function routeManager(app) {
 	app.post('/add_contact', authenticateToken, post.addContact);
 	app.get('/authenticate', get.authenticate);
 	app.get('/get_contacts', authenticateToken, get.getContactList);
+	app.get('/get_users', get.getUsers);
 	app.delete('/delete_contact', authenticateToken, del.deleteContact);
 }
 
