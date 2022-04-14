@@ -4,7 +4,7 @@
   "description": "database server",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon main.js",
+    "start": "pm2 start main.js",
     "test": "mocha -r config.env ./tests/testManager.js --exit"
   },
   "repository": {
@@ -21,6 +21,7 @@
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.3",
+    "pm2": "^5.2.0",
     "ws": "^8.5.0"
   },
   "devDependencies": {
