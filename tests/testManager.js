@@ -3,7 +3,8 @@ require('dotenv').config({ path: './config.env' });
 describe("Test Manager", function () {
     importTest('Websocket Test - Full Clean', './ws/cleanFull');
     importTest('Database Test - Full Clean', './db/cleanFull');
-    importTest('Database Test - Fail User', './db/failCreateUser');
+    importTest('Database Test - Fail Create User', './db/failCreateUser');
+    importTest('Database Test - Fail Login User', './db/failLoginUser');
 });
 
 function importTest(name, path) {

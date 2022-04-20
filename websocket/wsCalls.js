@@ -1,9 +1,6 @@
 ﻿require('dotenv').config({ path: './config.env' });
 const jwtAuth = require('../jwt/jwtAuth');
-const validateJSONFields = require('./wsHelpers').validateJSONFields;
-const validateEmail = require('./wsHelpers').validateEmail;
-const validatePhonenumber = require('./wsHelpers').validatePhonenumber;
-const validateName = require('./wsHelpers').validateName;
+const validate = require('../validation/formatValidation');
 const handleError = require('../routes/routeValidity').handleError;
 const pool = require('../db');
 
@@ -13,7 +10,7 @@ function connect(conn, JSONMessage, clients) {
         jwtAuth.authenticateWsToken(JSONMessage['TOKEN'], function (email) {
 
             // Add client and send response if valid request
-            if (validateEmail(email, conn)) {
+            if (validate.validateEmail(email, conn)) {
                     pool.query(
                         `SELECT phone_number FROM USERS WHERE email = $1`,
                         [email], (err, result) => {
@@ -79,12 +76,12 @@ function call(conn, JSONMessage, clients) {
 
         // Validate if required fields are in the JSON
         if (validRequest) {
-            validRequest = validateJSONFields(JSONMessage, ['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER', 'SDP'], conn);
+            validRequest = validate.validateJSONFields(JSONMessage, ['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER', 'SDP'], conn);
         }
 
         // Validate phonenumber with RegEx, send back error if failed
         if (validRequest) {
-            validRequest = validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER'], conn);
+            validRequest = validate.validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER', 'TARGET_PHONE_NUMBER'], conn);
         }
 
         // Send message to the client with the phonenumber
@@ -115,16 +112,16 @@ function callResponse(conn, JSONMessage, clients) {
         }
 
         // Validate if required fields are in the JSON
-        var validRequest = validateJSONFields(JSONMessage, ['RESPONSE', 'TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
+        var validRequest = validate.validateJSONFields(JSONMessage, ['RESPONSE', 'TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
 
         if (validRequest && JSONMessage['RESPONSE'] == 'accept') {
-            validRequest = validateJSONFields(JSONMessage, ['SDP'], conn);
+            validRequest = validate.validateJSONFields(JSONMessage, ['SDP'], conn);
         }
 
         // Validate phonenumber with RegEx, send back error if failed
         if (validRequest) {
-            validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
-                validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
+            validRequest = validate.validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
+                validate.validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
         }
 
         // Check if caller is calling
@@ -195,12 +192,12 @@ function hangUp(conn, JSONMessage, clients) {
         }
 
         // Validate if required fields are in the JSON
-        var validRequest = validateJSONFields(JSONMessage, ['TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
+        var validRequest = validate.validateJSONFields(JSONMessage, ['TARGET_PHONE_NUMBER', 'CALLER_PHONE_NUMBER'], conn);
 
         // Validate phonenumber with RegEx, send back error if failed
         if (validRequest) {
-            validRequest = validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
-                validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
+            validRequest = validate.validatePhonenumber(JSONMessage['TARGET_PHONE_NUMBER'], conn) &&
+                validate.validatePhonenumber(JSONMessage['CALLER_PHONE_NUMBER'], conn);
         }
 
         if (clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] != JSONMessage['CALLER_PHONE_NUMBER'] ||

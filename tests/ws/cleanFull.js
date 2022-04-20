@@ -6,20 +6,17 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
 var server = require('../../main.js');
+const common = require('../common');
+const user = require('../user');
+const createUser = require('../unit/createUser');
 
 // Environment variables
 chai.use(chaiHttp);
 const wsPort = 4000
 const wsAdress = 'ws://localhost:' + wsPort;
 
-var wsClientA;
-var wsClientAToken;
-const wsClientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-const wsClientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
-var wsClientB;
-var wsClientBToken;
-const wsClientBEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-const wsClientBPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+var userA = new user('Bob', 'Byggarn', 'Skopan');
+var userB = new user('You', 'Shall', 'notPass');
 
 /*
 NOTES FOR TESTING
@@ -38,43 +35,11 @@ and you want to make a new receive function.
 
 // Test the creation of user A
 it('Create user A', (done) => {
-    var userRequest = {
-        "firstname": "Gunnar",
-        "lastname": "Johansson",
-        "phone_number": wsClientAPhoneNumber,
-        "email": wsClientAEmail,
-        "password": "SuperSecure"
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            wsClientAToken = res.body
-            done();
-        });
+    createUser(done, userA);
 });
 
 it('Create user B', (done) => {
-    var userRequest = {
-        "firstname": "Gunnar",
-        "lastname": "Johansson",
-        "phone_number": wsClientBPhoneNumber,
-        "email": wsClientBEmail,
-        "password": "SuperSecure"
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            wsClientBToken = res.body
-            done();
-        });
+    createUser(done, userB);
 });
 
 // Test the creation of a connection
@@ -100,10 +65,10 @@ it('Establish Client Connection - Client A', (done) => {
         done();
     });
 
-    waitForSocketConnection(wsClientA, wsClientAToken, function () {
+    waitForSocketConnection(wsClientA, userA.token, function () {
         wsClientA.send(JSON.stringify({
             'REASON': 'connect',
-            'TOKEN': wsClientAToken
+            'TOKEN': userA.token
         }));
     });
 });
@@ -120,10 +85,10 @@ it('Establish Client Connection - Client B', (done) => {
         done();
     });
 
-    waitForSocketConnection(wsClientB, wsClientBToken, function () {
+    waitForSocketConnection(wsClientB, userB.token, function () {
         wsClientB.send(JSON.stringify({
             'REASON': 'connect',
-            'TOKEN': wsClientBToken
+            'TOKEN': userB.token
         }));
     });
 });
@@ -151,19 +116,19 @@ it('Client A Calling Client B', (done) => {
             throw new Error(data);
         } else {
             assert.equal(JSONData['REASON'], 'call');
-            assert.equal(JSONData['CALLER_PHONE_NUMBER'], wsClientAPhoneNumber);
-            assert.equal(JSONData['TARGET_PHONE_NUMBER'], wsClientBPhoneNumber);
+            assert.equal(JSONData['CALLER_PHONE_NUMBER'], userA.phoneNumber);
+            assert.equal(JSONData['TARGET_PHONE_NUMBER'], userB.phoneNumber);
             assert.notEqual(JSONData['SDP'], null);
         }
 
         completedSteps == 1 ? done() : completedSteps++;
     });
 
-    waitForSocketConnection(wsClientA, wsClientAToken, function () {
+    waitForSocketConnection(wsClientA, userA.token, function () {
         wsClientA.send(JSON.stringify({
             'REASON': 'call',
-            'CALLER_PHONE_NUMBER': wsClientAPhoneNumber,
-            'TARGET_PHONE_NUMBER': wsClientBPhoneNumber,
+            'CALLER_PHONE_NUMBER': userA.phoneNumber,
+            'TARGET_PHONE_NUMBER': userB.phoneNumber,
             'SDP': 'Something'
         }));
     });

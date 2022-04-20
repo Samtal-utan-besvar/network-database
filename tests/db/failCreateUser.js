@@ -3,15 +3,13 @@ const httpServer = require('../../main.js').httpServer;
 const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
-var server = require('../../main.js');
+const common = require('../common');
 
 // Environment variables
 chai.use(chaiHttp);
 
-var clientA;
-var clientAToken;
-var clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-var clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+var userAEmail = common.randomEmail();
+var userAPhoneNumber = common.randomPhoneNumber();
 
 /*
 NOTES FOR TESTING
@@ -26,13 +24,20 @@ and you want to make a new receive function.
  
 */
 
+// Create user with wrong data format
+it('Login user A (none-JSON)', (done) => {
+    var userRequest = "Definitly not a JSON"
+
+    testUserCreation(userRequest, 'Illegal Request', done);
+});
+
 // Create a user with an empty field
 it('Create user A (empty field)', (done) => {
     var userRequest = {
         "firstname": "",
         "lastname": "Johansson",
-        "phone_number": clientAPhoneNumber,
-        "email": clientAEmail,
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
         "password": "SuperSecure"
     }
 
@@ -41,13 +46,13 @@ it('Create user A (empty field)', (done) => {
 
 // Create a user with missing field
 it('Create user A (missing field)', (done) => {
-    clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-    clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+    userAEmail = common.randomEmail();
+    userAPhoneNumber = common.randomPhoneNumber();
 
     var userRequest = {
         "lastname": "Johansson",
-        "phone_number": clientAPhoneNumber,
-        "email": clientAEmail,
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
         "password": "SuperSecure"
     }
 
@@ -56,15 +61,15 @@ it('Create user A (missing field)', (done) => {
 
 // Create a user with to many fields
 it('Create user A (to many fields)', (done) => {
-    clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-    clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+    userAEmail = common.randomEmail();
+    userAPhoneNumber = common.randomPhoneNumber();
 
     var userRequest = {
         "DOSAttempt": "payload",
         "firstname": "Albert",
         "lastname": "Johansson",
-        "phone_number": clientAPhoneNumber,
-        "email": clientAEmail,
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
         "password": "SuperSecure"
     }
 
@@ -73,14 +78,14 @@ it('Create user A (to many fields)', (done) => {
 
 // Create a user with same email
 it('Create user A (same email)', (done) => {
-    clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-    clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+    userAEmail = common.randomEmail();
+    userAPhoneNumber = common.randomPhoneNumber();
 
     var userRequest = {
         "firstname": "Albert",
         "lastname": "Johansson",
-        "phone_number": clientAPhoneNumber,
-        "email": clientAEmail,
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
         "password": "SuperSecure"
     }
 
@@ -92,7 +97,7 @@ it('Create user A (same email)', (done) => {
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res, res.text).to.have.status(200);
-                    wsClientAToken = res.body
+                    wsuserAToken = res.body
                     resolve();
                 });
         })
@@ -100,12 +105,12 @@ it('Create user A (same email)', (done) => {
 
     createUser()
         .then(data => {
-            clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+            userAPhoneNumber = common.randomPhoneNumber();
             var userRequest = {
                 "firstname": "Albert",
                 "lastname": "Johansson",
-                "phone_number": clientAPhoneNumber,
-                "email": clientAEmail,
+                "phone_number": userAPhoneNumber,
+                "email": userAEmail,
                 "password": "SuperSecure"
             }
 
@@ -118,14 +123,14 @@ it('Create user A (same email)', (done) => {
 
 // Create a user with same phone number
 it('Create user A (same phone number)', (done) => {
-    clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
-    clientAPhoneNumber = Math.round(Math.random() * (8999999999) + 1000000000).toString();
+    userAEmail = common.randomEmail();
+    userAPhoneNumber = common.randomPhoneNumber();
 
     var userRequest = {
         "firstname": "Albert",
         "lastname": "Johansson",
-        "phone_number": clientAPhoneNumber,
-        "email": clientAEmail,
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
         "password": "SuperSecure"
     }
 
@@ -137,7 +142,7 @@ it('Create user A (same phone number)', (done) => {
                 .end((err, res) => {
                     expect(err).to.be.null;
                     expect(res, res.text).to.have.status(200);
-                    wsClientAToken = res.body
+                    wsuserAToken = res.body
                     resolve();
                 });
         })
@@ -145,12 +150,12 @@ it('Create user A (same phone number)', (done) => {
 
     createUser()
         .then(data => {
-            clientAEmail = (Math.random() + 1).toString(36).substring(2) + "@domain.test";
+            userAEmail = common.randomEmail();
             var userRequest = {
                 "firstname": "Albert",
                 "lastname": "Johansson",
-                "phone_number": clientAPhoneNumber,
-                "email": clientAEmail,
+                "phone_number": userAPhoneNumber,
+                "email": userAEmail,
                 "password": "SuperSecure"
             }
 

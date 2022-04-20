@@ -5,6 +5,7 @@ const sanitize = require('./routeValidity').sanitize;
 const handleError = require('./routeValidity').handleError;
 const bcrypt = require('bcryptjs');
 const pool = require('../db');
+const validate = require('../validation/formatValidation');
 
 const saltRounds = 10;
 const dataLimit = 128;
@@ -26,6 +27,18 @@ function createUser(req, res, next) {
         }
 
         const { firstname, lastname, phone_number, email, password } = req.body;
+
+        // Check if firstname is valid format
+        validate.validateName(firstname)
+
+        // Check if lastname is valid format
+        validate.validateName(lastname)
+
+        // Check if phone number is valid format
+        validate.validatePhonenumber(phone_number)
+
+        // Check if email is valid format
+        validate.validateEmail(email)
 
         // Check if email already exists (Async)
         const checkEmail = () => {

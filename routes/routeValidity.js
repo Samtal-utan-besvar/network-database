@@ -32,7 +32,7 @@ function handleError(err, res) {
     if (err.name == 'Defined' && res) {
         res.status(422).send(err.message);
     } else if(res) {
-        res.status(422).send('Looks like something went wrong... we\'re sorry!');
+        res.status(422).send('Looks like something went wrong... we\'re sorry! (Developer here, did you check so the request format is valid?)');
     }
 }
 

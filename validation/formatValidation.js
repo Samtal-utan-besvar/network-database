@@ -56,7 +56,7 @@ function validateName(name, connection) {
     const valid = String(name)
         .toLowerCase()
         .match(
-            /^[a-zA-Zהצוִײֵ]+ [a-zA-Zהצוִײֵ]+$/
+            /^[a-zוהצ]+$/
         )
 
     // warn client of invalid name
