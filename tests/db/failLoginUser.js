@@ -1,18 +1,15 @@
-const assert = require('assert');
 const httpServer = require('../../main.js').httpServer;
 const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const common = require('../common');
+var user = require('../user');
+const createUser = require('../unit/createUser');
 
 // Environment variables
 chai.use(chaiHttp);
 
-const userAFirstName = 'first';
-const userALastName = 'last';
-const userAPassword = 'superSecure2'
-var userAEmail = common.randomEmail();
-var userAPhoneNumber = common.randomPhoneNumber();
+const userA = new user('Fancy', 'Pants', 'Tablespoon');
 
 /*
 NOTES FOR TESTING
@@ -29,23 +26,7 @@ and you want to make a new receive function.
 
 // Create user A
 it('Create user A', (done) => {
-    var userRequest = {
-        "firstname": userAFirstName,
-        "lastname": userALastName,
-        "phone_number": userAPhoneNumber,
-        "email": userAEmail,
-        "password": userAPassword
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            userAToken = res.body
-            done();
-        });
+    createUser(done, userA);
 });
 
 // Login user with wrong data format
@@ -59,7 +40,7 @@ it('Login user A (none-JSON)', (done) => {
 it('Login user A (Empty Field)', (done) => {
     var userRequest = {
         "email": "",
-        "password": userAPassword
+        "password": userA.password
     }
 
     testUserLogin(userRequest, 'Empty Fields in Request', done);
@@ -68,7 +49,7 @@ it('Login user A (Empty Field)', (done) => {
 // Login user with missing field
 it('Login user A (Missing Field)', (done) => {
     var userRequest = {
-        "password": userAPassword
+        "password": userA.password
     }
 
     testUserLogin(userRequest, 'Illegal Request', done);
@@ -77,8 +58,8 @@ it('Login user A (Missing Field)', (done) => {
 // Login user with to many fields
 it('Login user A (To Many Field)', (done) => {
     var userRequest = {
-        "email": userAEmail,
-        "password": userAPassword,
+        "email": userA.email,
+        "password": userA.password,
         "DOS": "DOSAttempt"
     }
 
@@ -88,8 +69,8 @@ it('Login user A (To Many Field)', (done) => {
 // Login user with wrong email
 it('Login user A (Wrong Email)', (done) => {
     var userRequest = {
-        "email": userAEmail + "Fail",
-        "password": userAPassword,
+        "email": userA.email + "Fail",
+        "password": userA.password,
     }
 
     testUserLogin(userRequest, 'No User Found', done);
@@ -98,8 +79,8 @@ it('Login user A (Wrong Email)', (done) => {
 // Login user with wrong password
 it('Login user A (Wrong Password)', (done) => {
     var userRequest = {
-        "email": userAEmail,
-        "password": userAPassword + "Fail",
+        "email": userA.email,
+        "password": userA.password + "Fail",
     }
 
     testUserLogin(userRequest, 'Wrong Login Credentials', done);

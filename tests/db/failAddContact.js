@@ -4,23 +4,14 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const common = require('../common');
+var user = require('../user');
+const createUser = require('../unit/createUser');
 
 // Environment variables
 chai.use(chaiHttp);
 
-var userAToken;
-const userAFirstName = 'some';
-const userALastName = 'name';
-const userAPassword = 'superSecure'
-const userAEmail = common.randomEmail();
-const userAPhoneNumber = common.randomPhoneNumber();
-
-var userBToken;
-const userBFirstName = 'first';
-const userBLastName = 'last';
-const userBPassword = 'superSecure2'
-const userBEmail = common.randomEmail();
-const userBPhoneNumber = common.randomPhoneNumber();
+var userA = new user('This', 'is', 'getting');
+var userB = new user('aBit', 'Repetative', 'iThink');
 
 /*
 NOTES FOR TESTING
@@ -37,44 +28,12 @@ and you want to make a new receive function.
 
 // Create user A
 it('Create user A', (done) => {
-    var userRequest = {
-        "firstname": userAFirstName,
-        "lastname": userALastName,
-        "phone_number": userAPhoneNumber,
-        "email": userAEmail,
-        "password": userAPassword
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            userAToken = res.body
-            done();
-        });
+    createUser(userA);
 });
 
 // Test the creation of user B
 it('Create user B', (done) => {
-    var userRequest = {
-        "firstname": userBFirstName,
-        "lastname": userBLastName,
-        "phone_number": userBPhoneNumber,
-        "email": userBEmail,
-        "password": userBPassword
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            userBToken = res.body
-            done();
-        });
+    createUser(userB);
 });
 
 // Login user with wrong data format

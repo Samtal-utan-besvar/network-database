@@ -1,6 +1,6 @@
-﻿const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
-const sanitize = require('./routeValidity').sanitize;
-const handleError = require('./routeValidity').handleError;
+﻿const validateNoneEmpty = require('../validation/validate').validateNoneEmpty;
+const sanitize = require('../validation/validate').sanitize;
+const handleError = require('../validation/validate').handleError;
 const pool = require('../db');
 
 const dataLimit = 128;
@@ -8,18 +8,10 @@ const dataLimit = 128;
 function deleteContact (req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validateNoneEmpty(req.body)
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 1)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        sanitize(req.body, dataLimit, 1)
 
         const { contact_phonenumber } = req.body;
 

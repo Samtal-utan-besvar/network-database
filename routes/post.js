@@ -1,11 +1,11 @@
 ﻿const authenticateModule = require('../jwt/jwtAuth');
 const generateAccessToken = authenticateModule.generateAccessToken;
-const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
-const sanitize = require('./routeValidity').sanitize;
-const handleError = require('./routeValidity').handleError;
+const validateNoneEmpty = require('../validation/validate').validateNoneEmpty;
+const sanitize = require('../validation/validate').sanitize;
+const handleError = require('../validation/validate').handleError;
 const bcrypt = require('bcryptjs');
 const pool = require('../db');
-const validate = require('../validation/formatValidation');
+const validate = require('../validation/validate');
 
 const saltRounds = 10;
 const dataLimit = 128;
@@ -13,18 +13,13 @@ const dataLimit = 128;
 function createUser(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validateNoneEmpty(req.body);
+
+        // Check so all required fields are in request
+        validate.validateJSONFields(req.body, ['firstname', 'lastname', 'phone_number', 'email', 'password']);
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 5)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        sanitize(req.body, dataLimit, 5);
 
         const { firstname, lastname, phone_number, email, password } = req.body;
 
@@ -158,18 +153,10 @@ function createUser(req, res, next) {
 function login(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validateNoneEmpty(req.body)
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 2)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        sanitize(req.body, dataLimit, 2)
 
         const { email, password } = req.body;
 
@@ -223,18 +210,10 @@ function login(req, res, next) {
 function addContact(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validateNoneEmpty(req.body)
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 1)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        sanitize(req.body, dataLimit, 1)
 
         const { contact_phonenumber } = req.body;
 

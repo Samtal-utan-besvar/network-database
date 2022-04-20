@@ -6,17 +6,14 @@ const chaiHttp = require('chai-http');
 // Environment variables
 chai.use(chaiHttp);
 
-function createUser(done, user) {
+function loginUser(done, user) {
     var userRequest = {
-        "firstname": user.firstname,
-        "lastname": user.lastname,
-        "phone_number": user.phoneNumber,
         "email": user.email,
         "password": user.password
     }
 
     chai.request(httpServer)
-        .post('/create_user')
+        .post('/login')
         .send(userRequest)
         .end((err, res) => {
             expect(err).to.be.null;
@@ -27,4 +24,4 @@ function createUser(done, user) {
         });
 }
 
-module.exports = createUser;
+module.exports = loginUser;
