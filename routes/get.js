@@ -1,5 +1,4 @@
 ﻿const generateAccessToken = require('../jwt/jwtAuth').generateAccessToken;
-const validateNoneEmpty = require('../validation/validate').validateNoneEmpty;
 const sanitize = require('../validation/validate').sanitize;
 const handleError = require('../validation/validate').handleError;
 const pool = require('../db');
@@ -8,9 +7,6 @@ const dataLimit = 128;
 
 function authenticate(req, res, next) {
     try {
-        // Check so no values are empty
-        validateNoneEmpty(req.body)
-
         // Check if request meets sanitize requirements (field amount, data size)
         sanitize(req.body, dataLimit, 0)
 
@@ -27,9 +23,6 @@ function authenticate(req, res, next) {
 //Get Users Contact List
 function getContactList(req, res, next) {
     try {
-        // Check so no values are empty
-        validateNoneEmpty(req.body)
-
         // Check if request meets sanitize requirements (field amount, data size)
         sanitize(req.body, dataLimit, 0)
 

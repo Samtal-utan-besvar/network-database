@@ -1,7 +1,6 @@
 const createWebsocket = require('../common.js').createWebsocket;
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-var server = require('../../main.js');
 const user = require('../user');
 const createUser = require('../unit/createUser');
 const connectWebsocket = require('../unit/connectWebsocket');
@@ -28,7 +27,18 @@ NOTES FOR TESTING
 and you want to make a new receive function.
 
 - Don't forget to use done(); when finishing a test section, it().
- 
+
+
+
+TESTS:
+ * Create 2 users
+ * Create 2 websockets
+ * Connect websockets (verification)
+ * User A calls user B
+ * User B accepts call
+ * User A sends ICE candidates to user B
+ * User B sends ICE candidates to user A
+ * User A hangs up on user B
 */
 
 // Test the creation of users
@@ -82,9 +92,4 @@ it('Client B Sending ICE Candidate to Client A', (done) => {
 // Test client A hang up on client B
 it('Client A Hang Up on Client B', (done) => {
     hangUp(done, wsClientA, wsClientB, userA, userB);
-});
-
-it('Close Server', (done) => {
-    server.closeServer();
-    done();
 });

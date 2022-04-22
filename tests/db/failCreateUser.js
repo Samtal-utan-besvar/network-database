@@ -1,11 +1,8 @@
-const assert = require('assert');
 const httpServer = require('../../main.js').httpServer;
 const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const common = require('../common');
-var user = require('../user');
-const createUser = require('../unit/createUser');
 
 // Environment variables
 chai.use(chaiHttp);
@@ -24,6 +21,20 @@ and you want to make a new receive function.
 
 - Don't forget to use done(); when finishing a test section, it().
  
+
+
+TESTS:
+ * Wrong data format
+ * Empty field
+ * Missing Field
+ * To many fields
+ * Wrong field name
+ * Wrong firstname format
+ * Wrong lastname format
+ * Wrong email format
+ * Wrong phone number
+ * Same email
+ * Same phone number
 */
 
 // Create user with wrong data format

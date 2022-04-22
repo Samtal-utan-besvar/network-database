@@ -14,6 +14,27 @@ chai.use(chaiHttp);
 var userA = new user('Cornelis', 'Vreeswijk', 'CeciliaLösenord');
 var userB = new user('Ann', 'katarin', 'SäkertSomNatten');
 
+/*
+NOTES FOR TESTING
+
+- If the tests for connection setup (and verification) fail, the other tests could time out
+    due to dropped connection.
+
+- Make sure to clear previous listeners after using the wsWebsocket.on()
+and you want to make a new receive function.
+
+- Don't forget to use done(); when finishing a test section, it().
+
+
+
+TESTS:
+ * Create 2 users
+ * Login 2 users
+ * Add contact 2 users
+ * Get contacts 2 users
+ * Delete contact
+*/
+
 // Test the creation of user A
 it('Create User A', (done) => {
     createUser(done, userA);
