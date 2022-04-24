@@ -2,7 +2,7 @@
 
 # Exclude all the keys
 keys/*
-node_modules/
+node_modules/*
 
 # Exception to have a non-empty folder
 !keys/.gitkeep
