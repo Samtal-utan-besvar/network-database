@@ -1,11 +1,11 @@
-const assert = require('assert');
-const httpServer = require('../../main.js').httpServer;
 const chai = require('chai');
-const expect = chai.expect;
 const chaiHttp = require('chai-http');
-const common = require('../common');
 var user = require('../user');
 const createUser = require('../unit/createUser');
+const loginUser = require('../unit/loginUser');
+const addContact = require('../unit/addContact');
+const getContacts = require('../unit/getContacts');
+const deleteContact = require('../unit/deleteContact');
 
 // Environment variables
 chai.use(chaiHttp);
@@ -13,6 +13,27 @@ chai.use(chaiHttp);
 // Create Users
 var userA = new user('Cornelis', 'Vreeswijk', 'CeciliaLösenord');
 var userB = new user('Ann', 'katarin', 'SäkertSomNatten');
+
+/*
+NOTES FOR TESTING
+
+- If the tests for connection setup (and verification) fail, the other tests could time out
+    due to dropped connection.
+
+- Make sure to clear previous listeners after using the wsWebsocket.on()
+and you want to make a new receive function.
+
+- Don't forget to use done(); when finishing a test section, it().
+
+
+
+TESTS:
+ * Create 2 users
+ * Login 2 users
+ * Add contact 2 users
+ * Get contacts 2 users
+ * Delete contact
+*/
 
 // Test the creation of user A
 it('Create User A', (done) => {
@@ -26,132 +47,35 @@ it('Create User A', (done) => {
 
 // Test the login of user A
 it('Login User', (done) => {
-    var userRequest = {
-        "email": userA.email,
-        "password": userA.password
-    }
-
-    chai.request(httpServer)
-        .post('/login')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-
-            userA.token = res.body;    // Set token
-            done();
-        });
+    loginUser(done, userA);
 });
 
 // Test the login of user B
 it('Login User', (done) => {
-    var userRequest = {
-        "email": userB.email,
-        "password": userB.password
-    }
-
-    chai.request(httpServer)
-        .post('/login')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-
-            userB.token = res.body;    // Set token
-            done();
-        });
+    loginUser(done, userB);
 });
 
 // User A add contact user B
 it('User A add contact user B', (done) => {
-    var userRequest = {
-        "contact_phonenumber": userB.phoneNumber
-    }
-
-    chai.request(httpServer)
-        .post('/add_contact')
-        .set('authorization', userA.token)
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            done();
-        });
+    addContact(done, userA, userB);
 });
 
 // User B add contact user A
 it('User B add contact user A', (done) => {
-    var userRequest = {
-        "contact_phonenumber": userA.phoneNumber
-    }
-
-    chai.request(httpServer)
-        .post('/add_contact')
-        .set('authorization', userB.token)
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            done();
-        });
+    addContact(done, userB, userA);
 });
 
 // Get user A contacts
 it('Get user A contacts', (done) => {
-    chai.request(httpServer)
-        .get('/get_contacts')
-        .set('authorization', userA.token)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            assert.equal(res.body[0].firstname, userB.firstname);
-            assert.equal(res.body[0].lastname, userB.lastname);
-            assert.equal(res.body[0].phone_number, userB.phoneNumber);
-            done();
-        });
+    getContacts(done, userA, userB);
 });
 
 // Get user B contacts
 it('Get user B contacts', (done) => {
-    chai.request(httpServer)
-        .get('/get_contacts')
-        .set('authorization', userB.token)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            assert.equal(res.body[0].firstname, userA.firstname);
-            assert.equal(res.body[0].lastname, userA.lastname);
-            assert.equal(res.body[0].phone_number, userA.phoneNumber);
-            done();
-        });
+    getContacts(done, userB, userA);
 });
 
 // User A delete contact user B
 it('User A delete contact user B', (done) => {
-    var userRequest = {
-        "contact_phonenumber": userB.phoneNumber
-    }
-
-    chai.request(httpServer)
-        .delete('/delete_contact')
-        .send(userRequest)
-        .set('authorization', userA.token)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            done();
-        });
-});
-
-// Make sure user A contact list does no longer have user B
-it('Verify delete of contact user B', (done) => {
-    chai.request(httpServer)
-        .get('/get_contacts')
-        .set('authorization', userA.token)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res.body).to.deep.equal([]);
-            expect(res, res.text).to.have.status(200);
-            done();
-        });
+    deleteContact(done, userA, userB);
 });

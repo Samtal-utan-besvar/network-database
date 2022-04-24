@@ -1,6 +1,4 @@
-﻿const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
-const sanitize = require('./routeValidity').sanitize;
-const handleError = require('./routeValidity').handleError;
+﻿const validate = require('../validation/validate');
 const pool = require('../db');
 
 const dataLimit = 128;
@@ -8,20 +6,18 @@ const dataLimit = 128;
 function deleteContact (req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.validateNoneEmpty(req.body)
+
+        // Check so all required fields are in request
+        validate.validateJSONFields(req.body, ['contact_phonenumber']);
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 1)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.sanitize(req.body, dataLimit, 1)
 
         const { contact_phonenumber } = req.body;
+
+        // Check if phone number is valid format
+        validate.validatePhonenumber(contact_phonenumber)
 
         const deleteContactRequest = () => {
             return new Promise((resolve, reject) => {
@@ -36,7 +32,7 @@ function deleteContact (req, res, next) {
                         }
 
                         if (result.rowCount != 1) {
-                            var error = new Error('Unknown Contact');
+                            var error = new Error('Unknown Contact: ' + contact_phonenumber);
                             error.name = 'Defined';
                             reject(error);
                             return;
@@ -54,11 +50,11 @@ function deleteContact (req, res, next) {
                 res.status(200).send(data);
             })
             .catch(err => {
-                handleError(err, res);
+                validate.handleError(err, res);
             })
 
     } catch (err) {
-        handleError(err, res);
+        validate.handleError(err, res);
     }
 }
 

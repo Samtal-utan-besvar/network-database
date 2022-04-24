@@ -1,18 +1,14 @@
-const assert = require('assert');
 const httpServer = require('../../main.js').httpServer;
 const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
-const common = require('../common');
+var user = require('../user');
+const createUser = require('../unit/createUser');
 
 // Environment variables
 chai.use(chaiHttp);
 
-const userAFirstName = 'first';
-const userALastName = 'last';
-const userAPassword = 'superSecure2'
-var userAEmail = common.randomEmail();
-var userAPhoneNumber = common.randomPhoneNumber();
+const userA = new user('Fancy', 'Pants', 'Tablespoon');
 
 /*
 NOTES FOR TESTING
@@ -24,42 +20,40 @@ NOTES FOR TESTING
 and you want to make a new receive function.
 
 - Don't forget to use done(); when finishing a test section, it().
- 
+
+
+
+TESTS:
+ * Create user
+ * Wrong data format
+ * Empty field
+ * Missing field
+ * To many fields
+ * Wrong field name
+ * Wrong email format
+ * Wrong email
+ * Wrong password
+ * Same email
+ * Same phone number
 */
 
 // Create user A
 it('Create user A', (done) => {
-    var userRequest = {
-        "firstname": userAFirstName,
-        "lastname": userALastName,
-        "phone_number": userAPhoneNumber,
-        "email": userAEmail,
-        "password": userAPassword
-    }
-
-    chai.request(httpServer)
-        .post('/create_user')
-        .send(userRequest)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res, res.text).to.have.status(200);
-            userAToken = res.body
-            done();
-        });
+    createUser(done, userA);
 });
 
 // Login user with wrong data format
 it('Login user A (none-JSON)', (done) => {
-    var userRequest = "Definitly not a JSON"
+    var userRequest = new ArrayBuffer(8);
 
-    testUserLogin(userRequest, 'Illegal Request', done);
+    testUserLogin(userRequest, 'Request is Missing Field: email', done);
 });
 
 // Login user with empty field
 it('Login user A (Empty Field)', (done) => {
     var userRequest = {
         "email": "",
-        "password": userAPassword
+        "password": userA.password
     }
 
     testUserLogin(userRequest, 'Empty Fields in Request', done);
@@ -68,28 +62,49 @@ it('Login user A (Empty Field)', (done) => {
 // Login user with missing field
 it('Login user A (Missing Field)', (done) => {
     var userRequest = {
-        "password": userAPassword
+        "password": userA.password
     }
 
-    testUserLogin(userRequest, 'Illegal Request', done);
+    testUserLogin(userRequest, 'Request is Missing Field: email', done);
 });
 
 // Login user with to many fields
 it('Login user A (To Many Field)', (done) => {
     var userRequest = {
-        "email": userAEmail,
-        "password": userAPassword,
+        "email": userA.email,
+        "password": userA.password,
         "DOS": "DOSAttempt"
     }
 
     testUserLogin(userRequest, 'Illegal Request', done);
 });
 
+// Login user with wrong field name
+it('Login user A (Wrong Field Name)', (done) => {
+    var userRequest = {
+        "emailThisIsWrong": userA.email,
+        "password": userA.password
+    }
+
+    testUserLogin(userRequest, 'Request is Missing Field: email', done);
+});
+
+// Login user with wrong email format
+it('Login user A (Wrong Email Format)', (done) => {
+    const email = "illegal@.com"
+    var userRequest = {
+        "email": email,
+        "password": userA.password
+    }
+
+    testUserLogin(userRequest, 'Invalid Email: ' + email, done);
+});
+
 // Login user with wrong email
 it('Login user A (Wrong Email)', (done) => {
     var userRequest = {
-        "email": userAEmail + "Fail",
-        "password": userAPassword,
+        "email": userA.email + "Fail",
+        "password": userA.password,
     }
 
     testUserLogin(userRequest, 'No User Found', done);
@@ -98,14 +113,14 @@ it('Login user A (Wrong Email)', (done) => {
 // Login user with wrong password
 it('Login user A (Wrong Password)', (done) => {
     var userRequest = {
-        "email": userAEmail,
-        "password": userAPassword + "Fail",
+        "email": userA.email,
+        "password": userA.password + "Fail",
     }
 
     testUserLogin(userRequest, 'Wrong Login Credentials', done);
 });
 
-// Standardized create user request with callback on done()
+// Standardized login user request with callback on done()
 function testUserLogin(userRequest, expectedErrorText, done) {
     chai.request(httpServer)
         .post('/login')
