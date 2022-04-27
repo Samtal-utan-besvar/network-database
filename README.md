@@ -67,11 +67,19 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
+#### Get Contacts: *http://your_adress:8080/get_user*
+Header (authorization): *(User's JWT token)*
+```
+{}
+```
+* Returns users name, email and phone number
+***
 #### Get Contacts: *http://your_adress:8080/get_contacts*
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
+* Returns contacts in a list with their username, email and phone number
 ***
 #### Delete Contact: *http://your_adress:8080/delete_contact*
 Header (authorization): *(User's JWT token)*
