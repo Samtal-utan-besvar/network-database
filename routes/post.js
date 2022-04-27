@@ -1,10 +1,9 @@
 ﻿const authenticateModule = require('../jwt/jwtAuth');
 const generateAccessToken = authenticateModule.generateAccessToken;
-const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
-const sanitize = require('./routeValidity').sanitize;
-const handleError = require('./routeValidity').handleError;
+const handleError = require('../validation/validate').handleError;
 const bcrypt = require('bcryptjs');
 const pool = require('../db');
+const validate = require('../validation/validate');
 
 const saltRounds = 10;
 const dataLimit = 128;
@@ -12,20 +11,27 @@ const dataLimit = 128;
 function createUser(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.validateNoneEmpty(req.body);
+
+        // Check so all required fields are in request
+        validate.validateJSONFields(req.body, ['firstname', 'lastname', 'phone_number', 'email', 'password']);
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 5)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.sanitize(req.body, dataLimit, 5);
 
         const { firstname, lastname, phone_number, email, password } = req.body;
+
+        // Check if firstname is valid format
+        validate.validateName(firstname)
+
+        // Check if lastname is valid format
+        validate.validateName(lastname)
+
+        // Check if phone number is valid format
+        validate.validatePhonenumber(phone_number)
+
+        // Check if email is valid format
+        validate.validateEmail(email)
 
         // Check if email already exists (Async)
         const checkEmail = () => {
@@ -145,20 +151,18 @@ function createUser(req, res, next) {
 function login(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.validateNoneEmpty(req.body)
+
+        // Check so all required fields are in request
+        validate.validateJSONFields(req.body, ['email', 'password']);
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 2)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.sanitize(req.body, dataLimit, 2)
 
         const { email, password } = req.body;
+
+        // Check if email is valid format
+        validate.validateEmail(email)
 
         const loginRequest = () => {
             return new Promise((resolve, reject) => {
@@ -210,20 +214,73 @@ function login(req, res, next) {
 function addContact(req, res, next) {
     try {
         // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.validateNoneEmpty(req.body)
+
+        // Check so all required fields are in request
+        validate.validateJSONFields(req.body, ['contact_phonenumber']);
 
         // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 1)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        validate.sanitize(req.body, dataLimit, 1)
 
         const { contact_phonenumber } = req.body;
+
+        // Check if phone number is valid format
+        validate.validatePhonenumber(contact_phonenumber)
+
+        // Make sure the contact exists
+        const checkContactExists = () => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `SELECT phone_number FROM USERS WHERE phone_number = $1`,
+                    [contact_phonenumber], (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        if (result.rowCount == 0) {
+                            var error = new Error('Unknown Phone Number: ' + contact_phonenumber);
+                            error.name = 'Defined';
+                            reject(error);
+                            return;
+                        }
+
+                        if (result.rowCount > 1) {
+                            var error = new Error('Duplicate Phone Numbers Found');
+                            error.name = 'Defined';
+                            reject(error);
+                            return;
+                        }
+
+                        resolve();
+                    }
+                );
+            });
+        }
+
+        // Check if user is not adding itself as contact
+        const checkContactNotSelf = () => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `SELECT phone_number FROM USERS WHERE email = $1`,
+                    [req.user.email], (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        if (result.rows[0]['phone_number'] == contact_phonenumber) {
+                            var error = new Error('Can Not Add Yourself as Contact');
+                            error.name = 'Defined';
+                            reject(error);
+                            return;
+                        }
+
+                        resolve();
+                    }
+                );
+            });
+        }
 
         const addContactRequest = () => {
             return new Promise((resolve, reject) => {
@@ -239,8 +296,8 @@ function addContact(req, res, next) {
                             return;
                         }
 
-                        if (result.rowCount != 1) {
-                            var error = new Error('Unknown Phone Number Or User Already A Contact');
+                        if (result.rowCount == 0) {
+                            var error = new Error('Contact Already Added');
                             error.name = 'Defined';
                             reject(error);
                             return;
@@ -253,9 +310,21 @@ function addContact(req, res, next) {
         }
 
         // Make sure validity checks (async) are run before adding a contact
-        addContactRequest()
+        checkContactExists()
             .then(data => {
-                res.status(200).send('Contact Added!');
+                checkContactNotSelf()
+                    .then(data => {
+                        addContactRequest()
+                            .then(data => {
+                                res.status(200).send('Contact Added!');
+                            })
+                            .catch(err => {
+                                handleError(err, res);
+                            })
+                    })
+                    .catch(err => {
+                        handleError(err, res);
+                    })
             })
             .catch(err => {
                 handleError(err, res);
