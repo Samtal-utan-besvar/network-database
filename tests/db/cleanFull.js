@@ -5,6 +5,7 @@ const createUser = require('../unit/createUser');
 const loginUser = require('../unit/loginUser');
 const addContact = require('../unit/addContact');
 const getContacts = require('../unit/getContacts');
+const getUserData = require('../unit/getUserData');
 const deleteContact = require('../unit/deleteContact');
 
 // Environment variables
@@ -30,6 +31,7 @@ and you want to make a new receive function.
 TESTS:
  * Create 2 users
  * Login 2 users
+ * Get user data
  * Add contact 2 users
  * Get contacts 2 users
  * Delete contact
@@ -53,6 +55,11 @@ it('Login User', (done) => {
 // Test the login of user B
 it('Login User', (done) => {
     loginUser(done, userB);
+});
+
+// Get user A data
+it('Get Usar A Data', (done) => {
+    getUserData(done, userA);
 });
 
 // User A add contact user B

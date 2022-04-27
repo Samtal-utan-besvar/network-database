@@ -6,6 +6,7 @@ describe("Test Manager", function () {
     importTest('Database Test - Fail Create User', './db/failCreateUser');
     importTest('Database Test - Fail Login User', './db/failLoginUser');
     importTest('Database Test - Fail Add Contact', './db/failAddContact');
+    importTest('Database Test - Fail Get User Data', './db/failGetUserData');
     importTest('Database Test - Fail Get Contacts', './db/failGetContacts');
     importTest('Database Test - Fail Delete Contact', './db/failDeleteContact');
 });
