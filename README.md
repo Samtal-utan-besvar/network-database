@@ -67,7 +67,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Get Contacts: *http://your_adress:8080/get_user*
+#### Get User Data: *http://your_adress:8080/get_user*
 Header (authorization): *(User's JWT token)*
 ```
 {}
