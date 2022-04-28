@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './config.env' });
+
 const wsWebSocket = require('ws').WebSocket;
 
 function createWebsocket(adress) {
@@ -10,12 +10,12 @@ function waitForSocketConnection(socket, token, callback) {
     setTimeout(
         function () {
             if (socket.readyState === 1 && token) {
-                if (process.env.VERBOSE == true) console.log("Connection is active...");
+                if (process.env.VERBOSE == 'true') console.log("Connection is active...");
                 if (callback != null) {
                     callback();
                 }
             } else {
-                if (process.env.VERBOSE == true) console.log("Wait for connection...");
+                if (process.env.VERBOSE == 'true') console.log("Wait for connection...");
                 waitForSocketConnection(socket, token, callback);
             }
 

@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './config.env' });
+
 
 describe("Test Manager", function () {
     importTest('Websocket Test - Full Clean', './ws/cleanFull');
