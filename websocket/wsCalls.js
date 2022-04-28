@@ -1,4 +1,4 @@
-﻿require('dotenv').config({ path: './config.env' });
+﻿
 const jwtAuth = require('../jwt/jwtAuth');
 const validate = require('../validation/validate');
 const handleError = validate.handleError;
@@ -38,7 +38,7 @@ function connect(conn, JSONMessage, clients) {
                                 'RESPONSE': 'Connected'
                             }))
 
-                            if (process.env.VERBOSE == true) console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
+                            if (process.env.VERBOSE == 'true') console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
                         }
                     } catch (err) {
                         handleError(err);
@@ -88,7 +88,7 @@ function call(conn, JSONMessage, clients) {
                 'RESPONSE': 'Call Placed'
             }))
 
-            if (process.env.VERBOSE == true) console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Is Calling " + JSONMessage['TARGET_PHONE_NUMBER'] + ".");
+            if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Is Calling " + JSONMessage['TARGET_PHONE_NUMBER'] + ".");
         }
     } catch (err) {
         handleError(err);
@@ -136,7 +136,7 @@ function callResponse(conn, JSONMessage, clients) {
             clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = JSONMessage['CALLER_PHONE_NUMBER']
             clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = JSONMessage['TARGET_PHONE_NUMBER']
         }
-        if (process.env.VERBOSE == true) console.log("COMMON: " + JSONMessage['TARGET_PHONE_NUMBER'] + " Answered " + JSONMessage['CALLER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
+        if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['TARGET_PHONE_NUMBER'] + " Answered " + JSONMessage['CALLER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
     } catch (err) {
         handleError(err);
     }
@@ -198,7 +198,7 @@ function hangUp(conn, JSONMessage, clients) {
         clients[JSONMessage['CALLER_PHONE_NUMBER']]['STATUS'] = 'free'
         clients[JSONMessage['TARGET_PHONE_NUMBER']]['STATUS'] = 'free'
 
-        if (process.env.VERBOSE == true) {
+        if (process.env.VERBOSE == 'true') {
             console.log("COMMON: " + JSONMessage['CALLER_PHONE_NUMBER'] + " Hung Up On " + JSONMessage['TARGET_PHONE_NUMBER']);
         }
     } catch (err) {
@@ -209,7 +209,7 @@ function hangUp(conn, JSONMessage, clients) {
 function removeClient(conn, clients) {
     for (const [key, value] of Object.entries(clients)) {
         if (clients[key]['CONNECTION'] == conn) {
-            if (process.env.VERBOSE == true) console.log("COMMON: Remove Client");
+            if (process.env.VERBOSE == 'true') console.log("COMMON: Remove Client");
 
             // Set status for potantial user that has active call with user
             if (clients[clients[key]['STATUS']]) {
