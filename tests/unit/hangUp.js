@@ -23,8 +23,8 @@ function hangUp(done, wsClientSender, wsClientReceiver, userSender, userReceiver
             throw new Error(data);
         } else {
             assert.equal(JSONData['REASON'], 'HangUp');
-            assert.equal(JSONData['CALLER_PHONE_NUMBER'], userSender.phoneNumber);
-            assert.equal(JSONData['TARGET_PHONE_NUMBER'], userReceiver.phoneNumber);
+            assert.equal(JSONData['SENDER_PHONE_NUMBER'], userSender.phoneNumber);
+            assert.equal(JSONData['RECEIVER_PHONE_NUMBER'], userReceiver.phoneNumber);
         }
 
         completedSteps == 1 ? done() : completedSteps++;
@@ -33,8 +33,8 @@ function hangUp(done, wsClientSender, wsClientReceiver, userSender, userReceiver
     waitForSocketConnection(wsClientSender, userSender.token, function () {
         wsClientSender.send(JSON.stringify({
             'REASON': 'HangUp',
-            'CALLER_PHONE_NUMBER': userSender.phoneNumber,
-            'TARGET_PHONE_NUMBER': userReceiver.phoneNumber
+            'SENDER_PHONE_NUMBER': userSender.phoneNumber,
+            'RECEIVER_PHONE_NUMBER': userReceiver.phoneNumber
         }));
     });
 }

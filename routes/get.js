@@ -1,7 +1,7 @@
 ﻿const generateAccessToken = require('../jwt/jwtAuth').generateAccessToken;
 const sanitize = require('../validation/validate').sanitize;
 const handleError = require('../validation/validate').handleError;
-const pool = require('../db');
+const pool = require('../database/db');
 
 const dataLimit = 128;
 

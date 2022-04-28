@@ -1,5 +1,5 @@
 ﻿const validate = require('../validation/validate');
-const pool = require('../db');
+const pool = require('../database/db');
 
 const dataLimit = 128;
 

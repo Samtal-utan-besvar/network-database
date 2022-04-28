@@ -9,6 +9,9 @@ describe("Test Manager", function () {
     importTest('Database Test - Fail Get User Data', './db/failGetUserData');
     importTest('Database Test - Fail Get Contacts', './db/failGetContacts');
     importTest('Database Test - Fail Delete Contact', './db/failDeleteContact');
+    importTest('Database Test - Fail Put Firstname', './db/failPutFirstname');
+    importTest('Database Test - Fail Put Lastname', './db/failPutLastname');
+    importTest('Database Test - Fail Put Phone Number', './db/failPutPhoneNumber');
 });
 
 function importTest(name, path) {

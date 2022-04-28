@@ -2,7 +2,7 @@
 const generateAccessToken = authenticateModule.generateAccessToken;
 const handleError = require('../validation/validate').handleError;
 const bcrypt = require('bcryptjs');
-const pool = require('../db');
+const pool = require('../database/db');
 const validate = require('../validation/validate');
 
 const saltRounds = 10;
@@ -211,6 +211,8 @@ function login(req, res, next) {
         handleError(err, res);
     }
 }
+
+// Add a contact
 function addContact(req, res, next) {
     try {
         // Check so no values are empty

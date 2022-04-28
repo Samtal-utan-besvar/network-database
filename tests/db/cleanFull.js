@@ -1,12 +1,16 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 var user = require('../user');
+const common = require('../common');
 const createUser = require('../unit/createUser');
 const loginUser = require('../unit/loginUser');
 const addContact = require('../unit/addContact');
 const getContacts = require('../unit/getContacts');
 const getUserData = require('../unit/getUserData');
 const deleteContact = require('../unit/deleteContact');
+const putFirstname = require('../unit/putFirstname');
+const putLastname = require('../unit/putLastname');
+const putPhoneNumber = require('../unit/putPhonenumber');
 
 // Environment variables
 chai.use(chaiHttp);
@@ -34,6 +38,7 @@ TESTS:
  * Get user data
  * Add contact 2 users
  * Get contacts 2 users
+ * Modify user A firstname
  * Delete contact
 */
 
@@ -80,6 +85,21 @@ it('Get user A contacts', (done) => {
 // Get user B contacts
 it('Get user B contacts', (done) => {
     getContacts(done, userB, userA);
+});
+
+// Test changing user A firstname
+it('Change User A Firstname', (done) => {
+    putFirstname(done, userA, "SomethingBrandNew");
+});
+
+// Test changing user A lastname
+it('Change User A Lastname', (done) => {
+    putLastname(done, userA, "SomethingBrandNew");
+});
+
+// Test changing user A phone number
+it('Change User A Phone Number', (done) => {
+    putPhoneNumber(done, userA, common.randomPhoneNumber());
 });
 
 // User A delete contact user B

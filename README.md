@@ -104,8 +104,8 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "call",
-    "CALLER_PHONE_NUMBER": "1234567890",
-    "TARGET_PHONE_NUMBER": "1212121212",
+    "SENDER_PHONE_NUMBER": "1234567890",
+    "RECEIVER_PHONE_NUMBER": "1212121212",
     "SDP": "*SDP Request*"
 }
 ```
@@ -115,8 +115,8 @@ Header (authorization): *(User's JWT token)*
 {
     "REASON": "callResponse",
     "RESPONSE": "accept",                   // or "deny"
-    "CALLER_PHONE_NUMBER": "1212121212",
-    "TARGET_PHONE_NUMBER": "1234567890",
+    "SENDER_PHONE_NUMBER": "1212121212",
+    "RECEIVER_PHONE_NUMBER": "1234567890",
     "SDP": "*SDP Request*"
 }
 ```
@@ -125,8 +125,8 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "ICECandidate",
-    "TARGET_PHONE_NUMBER": "1212121212",
-    "ORIGIN_PHONE_NUMBER": "1234567890"
+    "RECEIVER_PHONE_NUMBER": "1212121212",
+    "SENDER_PHONE_NUMBER": "1234567890"
     "CANDIDATE": "ICE Candidate"
 }
 ```
@@ -135,7 +135,7 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "HangUp",
-    "CALLER_PHONE_NUMBER": "1234567890",
-    "TARGET_PHONE_NUMBER": "1212121212"
+    "SENDER_PHONE_NUMBER": "1234567890",
+    "RECEIVER_PHONE_NUMBER": "1212121212"
 }
 ```
