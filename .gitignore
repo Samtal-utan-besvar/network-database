@@ -1,12 +1,8 @@
 /.vs
 
-# Exclude all the keys
+# Exclude all the keys and modules
 keys/*
-<<<<<<< HEAD
-node_modules/*
-=======
 node_modules
->>>>>>> 60a58db24a254d877a6535ef44d887cb4506a5e9
 
 # Exception to have a non-empty folder
 !keys/.gitkeep
