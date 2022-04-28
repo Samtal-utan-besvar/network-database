@@ -50,7 +50,7 @@ function authenticateToken(req, res, next) {
 // Asynchronous
 function authenticateWsToken(token, callback) {
     if (token == null) {
-        var err = new Error('Empty JWT Tken');
+        var err = new Error('Empty JWT Token');
         err.name = 'Defined';
         throw err;
     }
