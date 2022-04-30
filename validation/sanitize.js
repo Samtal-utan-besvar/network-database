@@ -3,13 +3,12 @@ const validate = require('./validate')
 const blacklist = [
     "*", ";", "delete", "insert", "from", "put", "where", ' '
 ]
-const dataLimit = 128;
 
 function sanitize(req, res, next) {
     try {
         // Check data sizes
         for (const key in req.body) {
-            if (key.length > dataLimit || req.body[key].length > dataLimit) {
+            if (key.length > process.env.MAX_STRING_SIZE || req.body[key].length > process.env.MAX_STRING_SIZE) {
                 validate.throwError('Illegal Request');
             }
         }

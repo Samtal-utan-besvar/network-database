@@ -5,8 +5,6 @@ const bcrypt = require('bcryptjs');
 const pool = require('../database/db');
 const validate = require('../validation/validate');
 
-const saltRounds = 10;
-
 function createUser(req, res, next) {
     try {
         // Check so no values are empty
@@ -89,7 +87,7 @@ function createUser(req, res, next) {
             return new Promise((resolve, reject) => {
 
                 // Salt and hash password
-                bcrypt.genSalt(saltRounds, function (err, salt) {
+                bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS), function (err, salt) {
                     bcrypt.hash(password, salt, function (err, hash) {
                         pool.query(
                             `INSERT INTO USERS (firstname, lastname, phone_number, email, password_hash) 

@@ -88,6 +88,29 @@ Header (authorization): *(User's JWT token)*
     "contact_phonenumber": "1212121212"
 }
 ```
+***
+#### Modify Firstname: *http://your_adress:8080/put_firstname*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "firstname": "aNewFirstname"
+}
+```
+***
+#### Modify Lastname: *http://your_adress:8080/put_lastname*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "lastname": "aNewLastname"
+}
+```
+#### Modify Phonenumber: *http://your_adress:8080/put_phonenumber*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "phonenumber": "1313131313"
+}
+```
 
 &nbsp;
 
