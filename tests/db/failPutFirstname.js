@@ -33,6 +33,7 @@ TESTS:
  * To many fields
  * Wrong field name
  * Wrong firstname format
+ * SQL Injection
 */
 
 // Create user A
@@ -96,6 +97,15 @@ it('User A modify firstname (Wrong Name Format)', (done) => {
     }
 
     testPutFirstname(userA.token, userRequest, 'Invalid Name: ' + firstname, done);
+});
+
+// Put firstname with SQL injection
+it('User A modify firstname (SQL Injection)', (done) => {
+    var userRequest = {
+        "firstname": "SELET * FROM contacts;"
+    }
+
+    testPutFirstname(userA.token, userRequest, 'Illegal Request', done);
 });
 
 // Standardized put firstname request with callback on done()

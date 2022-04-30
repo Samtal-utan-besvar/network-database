@@ -37,6 +37,7 @@ TESTS:
  * To many fields
  * Wrong phone number format
  * Delete missing contact
+ * SQL Injection
 */
 
 // Create user A
@@ -121,6 +122,16 @@ it('User A delete contact (Missing Contact)', (done) => {
 
     testDeleteContact(userA.token, userRequest, 'Unknown Contact: ' + phoneNumber, done);
 });
+
+// Delete contact with SQL injection
+it('User A delete contact (SQL Injection)', (done) => {
+    var userRequest = {
+        "SELECT * FROM users;": phoneNumber
+    }
+
+    testDeleteContact(userA.token, userRequest, 'Illegal Request', done);
+});
+
 
 // Standardized delete contact request with callback on done()
 function testDeleteContact(token, userRequest, expectedErrorText, done) {

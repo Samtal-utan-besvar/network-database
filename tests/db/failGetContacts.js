@@ -28,6 +28,7 @@ TESTS:
  * Create user
  * Login user
  * To many fields
+ * SQL Injection
 */
 
 // Create user A
@@ -44,6 +45,15 @@ it('Login user A', (done) => {
 it('User A get Contacts (To Many Fields)', (done) => {
     var userRequest = {
         "DosAttempt": "Payload"
+    }
+
+    testGetContacts(userA.token, userRequest, 'Illegal Request', done);
+});
+
+// Get contacts with SQL injection
+it('User A get Contacts (SQL Injection)', (done) => {
+    var userRequest = {
+        "SQLInjectiont": "DELETE FROM contacts;"
     }
 
     testGetContacts(userA.token, userRequest, 'Illegal Request', done);

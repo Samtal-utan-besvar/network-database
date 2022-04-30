@@ -2,8 +2,6 @@ const handleError = require('../validation/validate').handleError;
 const pool = require('../database/db');
 const validate = require('../validation/validate');
 
-const dataLimit = 128;
-
 function putFirstname(req, res, next) {
     try {
         // Check so no values are empty
@@ -12,8 +10,8 @@ function putFirstname(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['firstname']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { firstname } = req.body;
 
@@ -60,8 +58,8 @@ function putLastname(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['lastname']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { lastname } = req.body;
 
@@ -108,8 +106,8 @@ function putPhonenumber(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['phonenumber']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { phonenumber } = req.body;
 

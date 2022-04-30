@@ -1,9 +1,8 @@
-
-
 describe("Test Manager", function () {
     importTest('Websocket Test - Full Clean', './ws/cleanFull');
     importTest('Database Test - Full Clean', './db/cleanFull');
     importTest('Database Test - Fail Create User', './db/failCreateUser');
+    importTest('Database Test - Fail Authenticate User', './db/failAuthenticate');
     importTest('Database Test - Fail Login User', './db/failLoginUser');
     importTest('Database Test - Fail Add Contact', './db/failAddContact');
     importTest('Database Test - Fail Get User Data', './db/failGetUserData');

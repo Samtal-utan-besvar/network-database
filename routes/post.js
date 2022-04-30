@@ -6,7 +6,6 @@ const pool = require('../database/db');
 const validate = require('../validation/validate');
 
 const saltRounds = 10;
-const dataLimit = 128;
 
 function createUser(req, res, next) {
     try {
@@ -16,8 +15,8 @@ function createUser(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['firstname', 'lastname', 'phone_number', 'email', 'password']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 5);
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 5);
 
         const { firstname, lastname, phone_number, email, password } = req.body;
 
@@ -156,8 +155,8 @@ function login(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['email', 'password']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 2)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 2)
 
         const { email, password } = req.body;
 
@@ -221,8 +220,8 @@ function addContact(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['contact_phonenumber']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { contact_phonenumber } = req.body;
 

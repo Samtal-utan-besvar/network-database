@@ -35,6 +35,7 @@ TESTS:
  * To many fields
  * Wrong field name
  * Wrong phonenumber format
+ * SQL Injection
 */
 
 // Create user A
@@ -112,6 +113,15 @@ it('User A modify phonenumber (User B Phone Number)', (done) => {
     }
 
     testPutPhoneNumber(userA.token, userRequest, 'Phone Number Already Used', done);
+});
+
+// Put phonenumber with SQL injection
+it('User A modify phonenumber (SQL Injection)', (done) => {
+    var userRequest = {
+        "DELETE FROM CONTACTS;": phoneNumber
+    }
+
+    testPutPhoneNumber(userA.token, userRequest, 'Illegal Request', done);
 });
 
 // Standardized put phonenumber request with callback on done()

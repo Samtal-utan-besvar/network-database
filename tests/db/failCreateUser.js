@@ -35,6 +35,7 @@ TESTS:
  * Wrong phone number
  * Same email
  * Same phone number
+ * SQL Injection
 */
 
 // Create user with wrong data format
@@ -257,6 +258,19 @@ it('Create user A (same phone number)', (done) => {
         .catch(err => {
             throw err;
         })
+});
+
+// Create a user with an sql injection
+it('Create user A (SQL Injection)', (done) => {
+    var userRequest = {
+        "firstname": "SELECT * FROM users;",
+        "lastname": "Johansson",
+        "phone_number": userAPhoneNumber,
+        "email": userAEmail,
+        "password": "SuperSecure"
+    }
+
+    testUserCreation(userRequest, 'Illegal Request', done);
 });
 
 // Standardized create user request with callback on done()

@@ -1,15 +1,13 @@
 ﻿const generateAccessToken = require('../jwt/jwtAuth').generateAccessToken;
-const sanitize = require('../validation/validate').sanitize;
+const validateLimit = require('../validation/validate').validateLimit;
 const handleError = require('../validation/validate').handleError;
 const pool = require('../database/db');
-
-const dataLimit = 128;
 
 //Authenticate a user and return a new token
 function authenticate(req, res, next) {
     try {
-        // Check if request meets sanitize requirements (field amount, data size)
-        sanitize(req.body, dataLimit, 0)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
 
         const newPayload = {
             'email': req.user.email
@@ -24,8 +22,8 @@ function authenticate(req, res, next) {
 //Get users information except id and password
 function getUserData(req, res, next) {
     try {
-        // Check if request meets sanitize requirements (field amount, data size)
-        sanitize(req.body, dataLimit, 0)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
 
         // Request all contacts (Async)
         const requestContacts = () => {
@@ -62,8 +60,8 @@ function getUserData(req, res, next) {
 //Get Users Contact List
 function getContactList(req, res, next) {
     try {
-        // Check if request meets sanitize requirements (field amount, data size)
-        sanitize(req.body, dataLimit, 0)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
 
         // Request all contacts (Async)
         const requestContacts = () => {

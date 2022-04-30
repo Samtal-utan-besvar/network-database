@@ -40,6 +40,7 @@ TESTS:
  * Add missing contact
  * Add contact
  * Add same contact
+ * SQL Injection
 */
 
 // Create user A
@@ -141,6 +142,15 @@ it('User A add contact B again (Contact Already Added)', (done) => {
     }
 
     testAddContact(userA.token, userRequest, 'Contact Already Added', done);
+});
+
+// SQL injection
+it('User A add contact B (SQL Injection)', (done) => {
+    var userRequest = {
+        "contact_phonenumber": "SELECT * FROM users;"
+    }
+
+    testAddContact(userA.token, userRequest, 'Illegal Request', done);
 });
 
 // Standardized add contact user request with callback on done()
