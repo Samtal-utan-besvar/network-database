@@ -23,8 +23,8 @@ function callUser(done, wsClientMain, wsClientContact, userMain, userContact) {
             throw new Error(data);
         } else {
             assert.equal(JSONData['REASON'], 'call');
-            assert.equal(JSONData['CALLER_PHONE_NUMBER'], userMain.phoneNumber);
-            assert.equal(JSONData['TARGET_PHONE_NUMBER'], userContact.phoneNumber);
+            assert.equal(JSONData['SENDER_PHONE_NUMBER'], userMain.phoneNumber);
+            assert.equal(JSONData['RECEIVER_PHONE_NUMBER'], userContact.phoneNumber);
             assert.notEqual(JSONData['SDP'], null);
         }
 
@@ -34,8 +34,8 @@ function callUser(done, wsClientMain, wsClientContact, userMain, userContact) {
     waitForSocketConnection(wsClientMain, userMain.token, function () {
         wsClientMain.send(JSON.stringify({
             'REASON': 'call',
-            'CALLER_PHONE_NUMBER': userMain.phoneNumber,
-            'TARGET_PHONE_NUMBER': userContact.phoneNumber,
+            'SENDER_PHONE_NUMBER': userMain.phoneNumber,
+            'RECEIVER_PHONE_NUMBER': userContact.phoneNumber,
             'SDP': 'Something'
         }));
     });

@@ -1,7 +1,5 @@
 ﻿const validate = require('../validation/validate');
-const pool = require('../db');
-
-const dataLimit = 128;
+const pool = require('../database/db');
 
 function deleteContact (req, res, next) {
     try {
@@ -11,8 +9,8 @@ function deleteContact (req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['contact_phonenumber']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { contact_phonenumber } = req.body;
 

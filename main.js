@@ -1,6 +1,8 @@
-﻿const express = require('express');
-require('dotenv').config();
+﻿const wsServer = require('ws').Server;
+const express = require('express');
 const app = express();
+app.use(express.json());
+require('dotenv').config();
 
 const motd = String.raw`
 _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
@@ -15,15 +17,14 @@ _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
 
 * Developed By PUM-8
 `
-
-// setup app
-app.use(express.json());
-
-const routeManager = require('./routeManager')(app);
-const wsServer = require('ws').Server;
-
+// You're free to add to the credits if you inherit the project
 console.log(motd);
+
+// Print environment variables
 console.log("Started with VERBOSE: " + process.env.VERBOSE);
+console.log("Started with DATABASE: " + process.env.DB_NAME + " (" + process.env.DB_HOST + ":" + process.env.DB_PORT + ")");
+console.log("");
+
 
 
 //
@@ -43,6 +44,8 @@ const wsManager = require('./websocket/wsManager')(ws);
 //
 //    HTTP SERVER
 //
+
+const routeManager = require('./routes/routeManager')(app);
 
 app.listen(parseInt(process.env.HTTP_PORT), () => {
     console.log("HTTP Server Listening on port: " + process.env.HTTP_PORT);

@@ -88,6 +88,29 @@ Header (authorization): *(User's JWT token)*
     "contact_phonenumber": "1212121212"
 }
 ```
+***
+#### Modify Firstname: *http://your_adress:8080/put_firstname*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "firstname": "aNewFirstname"
+}
+```
+***
+#### Modify Lastname: *http://your_adress:8080/put_lastname*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "lastname": "aNewLastname"
+}
+```
+#### Modify Phonenumber: *http://your_adress:8080/put_phonenumber*
+Header (authorization): *(User's JWT token)*
+```
+{
+    "phonenumber": "1313131313"
+}
+```
 
 &nbsp;
 
@@ -104,8 +127,8 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "call",
-    "CALLER_PHONE_NUMBER": "1234567890",
-    "TARGET_PHONE_NUMBER": "1212121212",
+    "SENDER_PHONE_NUMBER": "1234567890",
+    "RECEIVER_PHONE_NUMBER": "1212121212",
     "SDP": "*SDP Request*"
 }
 ```
@@ -115,8 +138,8 @@ Header (authorization): *(User's JWT token)*
 {
     "REASON": "callResponse",
     "RESPONSE": "accept",                   // or "deny"
-    "CALLER_PHONE_NUMBER": "1212121212",
-    "TARGET_PHONE_NUMBER": "1234567890",
+    "SENDER_PHONE_NUMBER": "1212121212",
+    "RECEIVER_PHONE_NUMBER": "1234567890",
     "SDP": "*SDP Request*"
 }
 ```
@@ -125,8 +148,8 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "ICECandidate",
-    "TARGET_PHONE_NUMBER": "1212121212",
-    "ORIGIN_PHONE_NUMBER": "1234567890"
+    "RECEIVER_PHONE_NUMBER": "1212121212",
+    "SENDER_PHONE_NUMBER": "1234567890"
     "CANDIDATE": "ICE Candidate"
 }
 ```
@@ -135,7 +158,7 @@ Header (authorization): *(User's JWT token)*
 ```
 {
     "REASON": "HangUp",
-    "CALLER_PHONE_NUMBER": "1234567890",
-    "TARGET_PHONE_NUMBER": "1212121212"
+    "SENDER_PHONE_NUMBER": "1234567890",
+    "RECEIVER_PHONE_NUMBER": "1212121212"
 }
 ```

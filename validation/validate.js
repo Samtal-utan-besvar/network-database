@@ -18,15 +18,8 @@ function validateNoneEmpty(request) {
     }
 }
 
-// Sanitize data lengths and expected json field amount
-function sanitize(request, dataLimit, expectedFieldAmount) {
-    // Check data sizes
-    for (entry in request) {
-        if (request[entry].length > dataLimit || request.length > dataLimit) {
-            throwError('Illegal Request');
-        }
-    }
-
+// validateLimit data lengths and expected json field amount
+function validateLimit(request, expectedFieldAmount) {
     // Check expected field amount
     if (Object.keys(request).length != expectedFieldAmount) {
         throwError('Illegal Request');
@@ -101,8 +94,9 @@ function throwError(description) {
 }
 
 module.exports.validateNoneEmpty = validateNoneEmpty;
-module.exports.sanitize = sanitize;
+module.exports.validateLimit = validateLimit;
 module.exports.handleError = handleError;
+module.exports.throwError = throwError;
 module.exports.validateJSONFields = validateJSONFields;
 module.exports.validatePhonenumber = validatePhonenumber;
 module.exports.validateEmail = validateEmail;

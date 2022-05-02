@@ -11,8 +11,8 @@ function sendIceCandidate(done, wsClientSender, wsClientReceiver, userSender, us
             throw new Error(data);
         } else {
             assert.equal(JSONData['REASON'], 'ICECandidate');
-            assert.equal(JSONData['TARGET_PHONE_NUMBER'], userReceiver.phoneNumber);
-            assert.equal(JSONData['ORIGIN_PHONE_NUMBER'], userSender.phoneNumber);
+            assert.equal(JSONData['RECEIVER_PHONE_NUMBER'], userReceiver.phoneNumber);
+            assert.equal(JSONData['SENDER_PHONE_NUMBER'], userSender.phoneNumber);
             assert.notEqual(JSONData['CANDIDATE'], null);
         }
 
@@ -22,8 +22,8 @@ function sendIceCandidate(done, wsClientSender, wsClientReceiver, userSender, us
     waitForSocketConnection(wsClientSender, userSender.token, function () {
         wsClientSender.send(JSON.stringify({
             'REASON': 'ICECandidate',
-            'TARGET_PHONE_NUMBER': userReceiver.phoneNumber,
-            'ORIGIN_PHONE_NUMBER': userSender.phoneNumber,
+            'RECEIVER_PHONE_NUMBER': userReceiver.phoneNumber,
+            'SENDER_PHONE_NUMBER': userSender.phoneNumber,
             'CANDIDATE': 'candidateData'
         }));
     });
