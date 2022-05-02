@@ -1,18 +1,15 @@
 const common = require('./common');
 
 class user{
-    // Private variables
-    firstname;
-    lastname;
-    password;
-    phoneNumber = common.randomPhoneNumber();
-    email = common.randomEmail();
-    token;
-
     constructor(firstname, lastname, password) {
+
+        // Class Variables
         this.firstname = firstname;
         this.lastname = lastname;
         this.password = password;
+        this.phoneNumber = common.randomPhoneNumber();
+        this.email = common.randomEmail();
+        this.token = "";
     }
 }
 
