@@ -76,7 +76,7 @@ it('Client A Calling Client B', (done) => {
 
 // Test accepting the call
 it('Client B Accept Call', (done) => {
-    respondCall(done, "accept", wsClientA, wsClientB, userA, userB);
+    respondCall(done, "accept", wsClientB, wsClientA, userB, userA);
 });
 
 // Test client A sending ICE candidates to client B

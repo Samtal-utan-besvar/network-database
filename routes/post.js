@@ -2,11 +2,8 @@
 const generateAccessToken = authenticateModule.generateAccessToken;
 const handleError = require('../validation/validate').handleError;
 const bcrypt = require('bcryptjs');
-const pool = require('../db');
+const pool = require('../database/db');
 const validate = require('../validation/validate');
-
-const saltRounds = 10;
-const dataLimit = 128;
 
 function createUser(req, res, next) {
     try {
@@ -16,8 +13,8 @@ function createUser(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['firstname', 'lastname', 'phone_number', 'email', 'password']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 5);
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 5);
 
         const { firstname, lastname, phone_number, email, password } = req.body;
 
@@ -90,7 +87,7 @@ function createUser(req, res, next) {
             return new Promise((resolve, reject) => {
 
                 // Salt and hash password
-                bcrypt.genSalt(saltRounds, function (err, salt) {
+                bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS), function (err, salt) {
                     bcrypt.hash(password, salt, function (err, hash) {
                         pool.query(
                             `INSERT INTO USERS (firstname, lastname, phone_number, email, password_hash) 
@@ -156,8 +153,8 @@ function login(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['email', 'password']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 2)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 2)
 
         const { email, password } = req.body;
 
@@ -211,6 +208,8 @@ function login(req, res, next) {
         handleError(err, res);
     }
 }
+
+// Add a contact
 function addContact(req, res, next) {
     try {
         // Check so no values are empty
@@ -219,8 +218,8 @@ function addContact(req, res, next) {
         // Check so all required fields are in request
         validate.validateJSONFields(req.body, ['contact_phonenumber']);
 
-        // Check if request meets sanitize requirements (field amount, data size)
-        validate.sanitize(req.body, dataLimit, 1)
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validate.validateLimit(req.body, 1)
 
         const { contact_phonenumber } = req.body;
 

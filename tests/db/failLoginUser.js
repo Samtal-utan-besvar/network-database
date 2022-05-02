@@ -35,6 +35,7 @@ TESTS:
  * Wrong password
  * Same email
  * Same phone number
+ * SQL Injection
 */
 
 // Create user A
@@ -119,6 +120,17 @@ it('Login user A (Wrong Password)', (done) => {
 
     testUserLogin(userRequest, 'Wrong Login Credentials', done);
 });
+
+// Login user with SQL injection
+it('Login user A (SQL Injection)', (done) => {
+    var userRequest = {
+        "email": userA.email,
+        "DELETE FROM CONTACTS;": userA.password,
+    }
+
+    testUserLogin(userRequest, 'Illegal Request', done);
+});
+
 
 // Standardized login user request with callback on done()
 function testUserLogin(userRequest, expectedErrorText, done) {

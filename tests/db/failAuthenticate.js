@@ -28,6 +28,7 @@ TESTS:
  * Create user
  * Login user
  * To many fields
+ * SQL Injection
 */
 
 // Create user A
@@ -40,10 +41,19 @@ it('Login user A', (done) => {
     loginUser(done, userA);
 });
 
-// Get contacts with to many fields
+// Authenticate with to many fields
 it('User A authenticate (To Many Fields)', (done) => {
     var userRequest = {
         "DosAttempt": "Payload"
+    }
+
+    testAuthenticate(userA.token, userRequest, 'Illegal Request', done);
+});
+
+// Authenticate with an SQL injecton
+it('User A authenticate (SQL Injection)', (done) => {
+    var userRequest = {
+        "SQLInjection": "DELETE FROM USERS;"
     }
 
     testAuthenticate(userA.token, userRequest, 'Illegal Request', done);
