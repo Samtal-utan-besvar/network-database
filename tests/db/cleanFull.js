@@ -10,7 +10,7 @@ const getUserData = require('../unit/getUserData');
 const deleteContact = require('../unit/deleteContact');
 const putFirstname = require('../unit/putFirstname');
 const putLastname = require('../unit/putLastname');
-const putPhoneNumber = require('../unit/putPhonenumber');
+const putPhoneNumber = require('../unit/putPhoneNumber');
 
 // Environment variables
 chai.use(chaiHttp);
