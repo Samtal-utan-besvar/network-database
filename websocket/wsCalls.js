@@ -40,13 +40,13 @@ function connect(conn, JSONMessage, clients) {
                             if (process.env.VERBOSE == 'true') console.log("COMMON: User With Phone Number " + result.rows[0]['phone_number'] + " Has Connected.");
                         }
                     } catch (err) {
-                        handleError(err);
+                        handleError(err, conn);
                     }
                 }
             );
         });
     } catch (err) {
-        handleError(err);
+        handleError(err, conn);
     }
 }
 
@@ -90,7 +90,7 @@ function call(conn, JSONMessage, clients) {
             if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['SENDER_PHONE_NUMBER'] + " Is Calling " + JSONMessage['RECEIVER_PHONE_NUMBER'] + ".");
         }
     } catch (err) {
-        handleError(err);
+        handleError(err, conn);
     }   
 }
 
@@ -137,7 +137,7 @@ function callResponse(conn, JSONMessage, clients) {
         }
         if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['SENDER_PHONE_NUMBER'] + " Answered " + JSONMessage['RECEIVER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
     } catch (err) {
-        handleError(err);
+        handleError(err, conn);
     }
 }
 
@@ -160,7 +160,7 @@ function ICECandidate(conn, JSONMessage, clients) {
         // Send message to the client with the phonenumber
         clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
     } catch (err) {
-        handleError(err);
+        handleError(err, conn);
     }
 }
 
@@ -201,7 +201,7 @@ function hangUp(conn, JSONMessage, clients) {
             console.log("COMMON: " + JSONMessage['SENDER_PHONE_NUMBER'] + " Hung Up On " + JSONMessage['RECEIVER_PHONE_NUMBER']);
         }
     } catch (err) {
-        handleError(err);
+        handleError(err, conn);
     }
 }
 

@@ -104,6 +104,7 @@ Header (authorization): *(User's JWT token)*
     "lastname": "aNewLastname"
 }
 ```
+***
 #### Modify Phonenumber: *http://your_adress:8080/put_phonenumber*
 Header (authorization): *(User's JWT token)*
 ```
