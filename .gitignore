@@ -1,6 +1,6 @@
 /.vs
 
-# Exclude all the keys
+# Exclude all the keys and modules
 keys/*
 node_modules
 

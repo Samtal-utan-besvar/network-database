@@ -1,26 +1,13 @@
 ﻿const generateAccessToken = require('../jwt/jwtAuth').generateAccessToken;
-const verifyNoneEmpty = require('./routeValidity').verifyNoneEmpty;
-const sanitize = require('./routeValidity').sanitize;
-const handleError = require('./routeValidity').handleError;
-const pool = require('../db');
+const validateLimit = require('../validation/validate').validateLimit;
+const handleError = require('../validation/validate').handleError;
+const pool = require('../database/db');
 
-const dataLimit = 128;
-
+//Authenticate a user and return a new token
 function authenticate(req, res, next) {
     try {
-        // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
-
-        // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 0)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
 
         const newPayload = {
             'email': req.user.email
@@ -32,28 +19,55 @@ function authenticate(req, res, next) {
     }
 }
 
-//Get Users Contact List
-function getContactList(req, res, next) {
+//Get users information except id and password
+function getUserData(req, res, next) {
     try {
-        // Check so no values are empty
-        if (!verifyNoneEmpty(req.body)) {
-            var error = new Error('Empty Fields in Request');
-            error.name = 'Defined';
-            throw error;
-        }
-
-        // Check if request meets sanitize requirements (field amount, data size)
-        if (!sanitize(req.body, dataLimit, 0)) {
-            var error = new Error('Illegal Request');
-            error.name = 'Defined';
-            throw error;
-        }
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
 
         // Request all contacts (Async)
         const requestContacts = () => {
             return new Promise((resolve, reject) => {
                 pool.query(
-                    `SELECT u.phone_number, u.firstname, u.lastname 
+                    `SELECT phone_number, firstname, lastname, email
+                        FROM USERS
+                        WHERE email = $1`,
+                    [req.user.email], (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        } else {
+                            resolve(result.rows);
+                        }
+                    }
+                );
+            });
+        }
+
+        requestContacts()
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                handleError(err, res);
+            })
+
+    } catch (err) {
+        handleError(err, res);
+    }
+}
+
+//Get Users Contact List
+function getContactList(req, res, next) {
+    try {
+        // Check if request meets validateLimit requirements (field amount, data size)
+        validateLimit(req.body, 0)
+
+        // Request all contacts (Async)
+        const requestContacts = () => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `SELECT u.phone_number, u.firstname, u.lastname, u.email
                         FROM CONTACTS c 
                         INNER JOIN USERS u ON c.contact_user_id = u.user_id 
                         WHERE c.owner_id = (SELECT user_id FROM USERS WHERE email = $1)`,
@@ -82,5 +96,8 @@ function getContactList(req, res, next) {
     }
 }
 
+// Search for user based on number or name
+
 module.exports.authenticate = authenticate;
+module.exports.getUserData = getUserData;
 module.exports.getContactList = getContactList;
