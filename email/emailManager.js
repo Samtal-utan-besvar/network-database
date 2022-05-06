@@ -1,9 +1,12 @@
 ﻿const nodemailer = require('nodemailer');
+const JSDOM = require('jsdom').JSDOM;
 const logger = require('../logger/common');
+const pageLoader = require('../pages/loader');
 const { google } = require("googleapis");
 const { handleError } = require('../validation/validate');
 const OAuth2 = google.auth.OAuth2;
-let transporter;
+
+var transporter;
 
 // Setup the transporter for sending emails
 function setupTransporter() {
@@ -43,9 +46,21 @@ function createMessage(fromName, toEmail, subject, htmlObject) {
     };
 }
 
+// Inserts verification code into DOM object. Beware, parsers strips away BOM
+function insertVerificationCode(domtext, verificationCode) {
+    var document = new JSDOM(domtext),
+        target = document.window.document.getElementById("verificationCode");
+
+    target.textContent = verificationCode
+
+    var new_document = document.serialize();
+    return new_document;
+}
+
 // Send email to change user's password
 function sendPasswordChangeEmail(email, verifyCode) {
-    createMessage('SUB - Support', email, 'Ändring av Ditt Lösenord', '<p>Yeab BOI</p>');
+    var htmlMessage = insertVerificationCode(pageLoader.files.changePasswordHtml, verifyCode);
+    createMessage('SUB - Support', email, 'Ändring av Ditt Lösenord', htmlMessage);
 
     transporter.sendMail(message, (err, info) => {
         if (err) {

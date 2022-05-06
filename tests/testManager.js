@@ -1,4 +1,5 @@
 const main = require('../setup/main');
+const { handleError } = require('../validation/validate');
 
 function runTests() {
     describe("Test Manager", function () {
@@ -41,7 +42,15 @@ function importTest(name, path) {
 }
 
 main.subscribeIsSetup(isSetup);
-before(async () => {
-    await main.setupMain;
+before(function (done) {
+    this.timeout(5000);
+
+    main.setupMain
+        .then(data => {
+            done();
+        })
+        .catch(err => {
+            handleError(err);
+        });
 });
 runTests();

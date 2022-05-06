@@ -2,11 +2,14 @@
 const express = require('express');
 const emailManager = require('../email/emailManager');
 const logger = require('../logger/common');
+const loadPages = require('../pages/loader').loadPages;
 const app = express();
 app.use(express.json());
 require('dotenv').config();
 
 var subscribedSetupCallback = [];
+var setupStatus = 0;
+var setupStatusComplete = 2;
 
 const setupMain = new Promise((resolve, reject) => {
     const motd = String.raw`
@@ -52,11 +55,13 @@ _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
     //      HTTP SERVER
     //
 
-    const routeManager = require('../routes/routeManager')(app);
-
+    
     app.listen(parseInt(process.env.HTTP_PORT), () => {
         console.log("HTTP Server Listening on port: " + process.env.HTTP_PORT + "\n");
     });
+
+    // Load route manager
+    const routeManager = require('../routes/routeManager')(app);
 
     module.exports.closeServer = function () {
         ws.close();
@@ -66,7 +71,7 @@ _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
 
 
     //
-    //      Email Manager
+    //      EMAIL MANAGER
     //
 
     // Setup transporter and verify it's correctly setup
@@ -78,15 +83,37 @@ _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
         for (callback of subscribedSetupCallback) {
             callback();
         }
-        resolve();
+        updateSetupStatus(resolve);
     };
     emailManager.verifyEmailTransporter(complete);
 
-    emailManager.sendPasswordChangeEmail("thegamer632@gmail.com", "TestCode");
+
+
+    //
+    //      FILE MANAGER
+    //
+
+    // Load all pages into memory
+    loadPages
+        .then(data => {
+            updateSetupStatus(resolve);
+        })
+        .catch(err => {
+            handleError(err);
+        })
 });
 
 function subscribeIsSetup(callback) {
     subscribedSetupCallback.push(callback);
+}
+
+// Update the setup status and resolve when criteria is met
+function updateSetupStatus(resolve) {
+    setupStatus++;
+    if (setupStatus >= setupStatusComplete) {
+        emailManager.sendPasswordChangeEmail("thegamer632@gmail.com", "RandomCode123");
+        resolve();
+    }
 }
 
 module.exports.subscribeIsSetup = subscribeIsSetup;
