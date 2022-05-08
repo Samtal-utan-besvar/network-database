@@ -1,8 +1,10 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const { handleError, throwError } = require('../validation/validate');
 
 var tokenSecret;
 const tokenExpireTime = 604800;   // 1 week (seconds)
+const resetTokenExpireTime = 300;    // 5 min
 
 // Read in the token secret from key
 try {
@@ -24,8 +26,11 @@ try {
 process.env.TOKEN_SECRET = tokenSecret;
 
 function generateAccessToken(payload) {
-    //console.log(payload);
     return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: tokenExpireTime + 's' });
+}
+
+function generatePasswordResetToken(payload) {
+    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: resetTokenExpireTime + 's' });
 }
 
 function authenticateToken(req, res, next) {
@@ -35,37 +40,35 @@ function authenticateToken(req, res, next) {
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
         if (err) {
-            console.log(err)
-
-            return res.status(403).send('');
+            handleError(err);
         }
 
         // user is the payload of token
         req.user = user
-
         next();
     })
 }
 
 // Asynchronous
 function authenticateWsToken(token, callback) {
-    if (token == null) {
-        var err = new Error('Empty JWT Token');
-        err.name = 'Defined';
-        throw err;
-    }
-
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-        if (err) {
-            var err = new Error('Invalid JWT Token');
-            err.name = 'Defined';
-            throw err;
+    try {
+        if (token == null) {
+            throwError('Empty JWT Token');
         }
 
-        callback(user.email);
-    });
+        jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+            if (err) {
+                throwError('Invalid JWT Token');
+            }
+
+            callback(user.email);
+        });
+    } catch (err) {
+        handleError(err);
+    }
 }
 
 module.exports.authenticateToken = authenticateToken;
 module.exports.authenticateWsToken = authenticateWsToken;
 module.exports.generateAccessToken = generateAccessToken;
+module.exports.generatePasswordResetToken = generatePasswordResetToken;

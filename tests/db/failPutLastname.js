@@ -9,7 +9,7 @@ const loginUser = require('../unit/loginUser');
 // Environment variables
 chai.use(chaiHttp);
 
-const userA = new user('friest', 'seicond', 'theird');
+const userA = new user('friest', 'seicond', 'theasdsadird');
 
 /*
 NOTES FOR TESTING

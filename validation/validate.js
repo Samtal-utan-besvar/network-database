@@ -1,4 +1,4 @@
-
+const passwordMinSize = 8;
 
 // Validate JSON fields inclusion
 function validateJSONFields(json, expectFields) {
@@ -74,6 +74,16 @@ function validateName(name) {
     return valid;
 }
 
+// Validate the password
+function validatePassword(password) {
+    // warn client of invalid name
+    if (password.length < passwordMinSize) {
+        throwError('Invalid Password Size, 8 characters required');
+    }
+
+    return true;
+}
+
 // Propperly handle the erros caused during a request
 function handleError(err, res) {
     if (process.env.VERBOSE == 'true') console.log('WARNING: ' + err.message);
@@ -101,3 +111,4 @@ module.exports.validateJSONFields = validateJSONFields;
 module.exports.validatePhonenumber = validatePhonenumber;
 module.exports.validateEmail = validateEmail;
 module.exports.validateName = validateName;
+module.exports.validatePassword = validatePassword;

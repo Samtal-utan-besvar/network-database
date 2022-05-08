@@ -111,7 +111,7 @@ function subscribeIsSetup(callback) {
 function updateSetupStatus(resolve) {
     setupStatus++;
     if (setupStatus >= setupStatusComplete) {
-        emailManager.sendPasswordChangeEmail("thegamer632@gmail.com", "RandomCode123");
+        //emailManager.sendPasswordChangeEmail("thegamer632@gmail.com", "RandomCode123");
         resolve();
     }
 }

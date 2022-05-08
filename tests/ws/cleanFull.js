@@ -14,8 +14,8 @@ chai.use(chaiHttp);
 const wsPort = 4000
 const wsAdress = 'ws://localhost:' + wsPort;
 
-var userA = new user('Bob', 'Byggarn', 'Skopan');
-var userB = new user('You', 'Shall', 'notPass');
+var userA = new user('Bob', 'Byggarn', 'Skoasdasdpan');
+var userB = new user('You', 'Shall', 'notPaasdasdss');
 
 /*
 NOTES FOR TESTING

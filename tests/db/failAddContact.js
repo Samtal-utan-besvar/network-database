@@ -11,8 +11,8 @@ const addContact = require('../unit/addContact');
 // Environment variables
 chai.use(chaiHttp);
 
-const userA = new user('This', 'is', 'getting');
-const userB = new user('aBit', 'Repetative', 'iThink');
+const userA = new user('This', 'is', 'aaaagetting');
+const userB = new user('aBit', 'Repetative', 'aaaaiThink');
 
 /*
 NOTES FOR TESTING
