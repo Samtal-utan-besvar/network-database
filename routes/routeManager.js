@@ -1,6 +1,5 @@
 const sanitize = require('../validation/sanitize.js');
 const authenticateToken = require('../jwt/jwtAuth').authenticateToken;
-const authenticateResetToken = require('../jwt/jwtAuth').authenticateResetToken;
 
 const get = require('./get');
 const post = require('./post');
