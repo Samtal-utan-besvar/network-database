@@ -1,4 +1,3 @@
-
 const wsWebSocket = require('ws').WebSocket;
 
 function createWebsocket(adress) {
