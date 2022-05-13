@@ -63,7 +63,7 @@ function validateName(name) {
     const valid = String(name)
         .toLowerCase()
         .match(
-            /^[a-zедц]+$/
+            /^[a-zедц ]+$/
         )
 
     // warn client of invalid name
@@ -90,7 +90,7 @@ function handleError(err, res) {
 
     // Only return errors with 'Defined' as to not leak database or critical errors
     if (err.name == 'Defined' && res) {
-        res.status(422).send(err.message);
+        if (res.status) res.status(422).send(err.message);
     } else if (res) {
         res.status(422).send('Looks like something went wrong... we\'re sorry! (Developer here, did you check so the request format is valid?)');
     }

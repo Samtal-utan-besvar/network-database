@@ -1,7 +1,7 @@
 const validate = require('./validate')
 
 const blacklist = [
-    "*", ";", "delete", "insert", "from", "put", "where", ' '
+    "*", ";", "delete", "insert", "from", "put", "where"
 ]
 
 function sanitize(req, res, next) {

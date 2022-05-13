@@ -117,7 +117,7 @@ function callResponse(conn, JSONMessage, clients) {
         validate.validatePhonenumber(JSONMessage['SENDER_PHONE_NUMBER']);
 
         // Check if caller is calling
-        if (clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] != 'calling') {
+        if (clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] != 'calling') {
             var error = new Error('Caller is Missing Calling Status');
             error.name = 'Defined';
             throw error;
@@ -134,6 +134,10 @@ function callResponse(conn, JSONMessage, clients) {
         if (JSONMessage['RESPONSE'] == 'accept') {
             clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] = JSONMessage['SENDER_PHONE_NUMBER']
             clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] = JSONMessage['RECEIVER_PHONE_NUMBER']
+        } else {
+            clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] = 'free'
+            clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] = 'free'
+            console.log("all free now");
         }
         if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['SENDER_PHONE_NUMBER'] + " Answered " + JSONMessage['RECEIVER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
     } catch (err) {
