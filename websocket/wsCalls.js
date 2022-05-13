@@ -117,7 +117,7 @@ function callResponse(conn, JSONMessage, clients) {
         validate.validatePhonenumber(JSONMessage['SENDER_PHONE_NUMBER']);
 
         // Check if caller is calling
-        if (clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] != 'calling') {
+        if (clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] != 'calling') {
             var error = new Error('Caller is Missing Calling Status');
             error.name = 'Defined';
             throw error;
