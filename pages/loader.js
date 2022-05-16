@@ -5,7 +5,7 @@ const { handleError } = require('../validation/validate');
 var files = {};
 
 const loadChangePasswordHtml = new Promise((resolve, reject) => {
-    fs.readFile('__dirname/../pages/email/html/changePassword.html', 'utf8', function (err, data) {
+    fs.readFile('./pages/email/html/changePassword.html', 'utf8', function (err, data) {
         if (err) {
             console.log(err);
             handleError(err);
