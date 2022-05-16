@@ -40,14 +40,11 @@ function importTest(name, path) {
     });
 }
 
-// Wait for servers to be setup
+// Run tests once setup
+main.subscribeIsSetup(run);
+
+// Setup services
 process.nextTick(function () {
     main.setupMain
-        .then(data => {
-            run();
-        }).catch(err => {
-            handleError(err);
-        })
 })
-
 runTests();
