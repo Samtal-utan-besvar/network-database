@@ -1,10 +1,10 @@
-
 const connect = require('./wsCalls').connect;
 const call = require('./wsCalls').call;
 const callResponse = require('./wsCalls').callResponse;
 const ICECandidate = require('./wsCalls').ICECandidate;
 const hangUp = require('./wsCalls').hangUp;
 const removeClient = require('./wsCalls').removeClient;
+const handleError = require('../validation/validate').handleError;
 
 var clients = {};
 
@@ -17,9 +17,9 @@ function wsManager(ws) {
 
             try {
                 JSONMessage = JSON.parse(message);
-            } catch (e) {
-                console.log(e); // Couldn't parse the JSON object
-                return; // TODO: Implement a better error handler
+            } catch (err) {
+                handleError(err);
+                return; 
             }
 
             if (JSONMessage['REASON'] == 'connect') {

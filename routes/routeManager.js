@@ -1,12 +1,13 @@
 const sanitize = require('../validation/sanitize.js');
 const authenticateToken = require('../jwt/jwtAuth').authenticateToken;
 
+// Get the route functions
 const get = require('./get');
 const post = require('./post');
 const del = require('./delete');
 const put = require('./put');
 
-// ROUTES //
+// Add the different routes
 function routeManager(app) {
 	app.post('/create_user', sanitize, post.createUser);
 	app.post('/login', sanitize, post.login);

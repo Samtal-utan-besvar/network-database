@@ -22,6 +22,8 @@ PostgreSQL: https://www.postgresql.org/download/windows/ \
 OpenSSL: https://slproweb.com/products/Win32OpenSSL.html (Optional)
 
 ### Setup
+First you need to install all the NodeJS dependencies, this is done by running the command ```npm install``` while inside the project folder. It's also highly recommended to globally install PM2 with the command ```npm install pm2@latest -g```. PM2 allows advanced controlling and monitoring of processes both locally and remote through a webbrowser.
+
 Once the required dependencies are installed you need to generate a SHA-256 key in the ./keys folder with the name of *tokenSecret.key*. This can be done using OpenSSL with the command ```openssl genrsa -out tokenSecret.key 4096``` while in the keys folder.
 
 To generate the required database use the database.sql file containing the two schemas used for the user and contact table. This can be done while connected to the database with the correct user privileges.
@@ -188,3 +190,26 @@ Header (authorization): *(Password Reset Token)*
     "RECEIVER_PHONE_NUMBER": "1212121212"
 }
 ```
+
+## TURN Server for WebRTC
+It's recommended to use CoTurn as a TURN server. This has been tested with the project and works once setup correctly. CoTurn can be found here: https://github.com/coturn/coturn
+
+## Nodemailer
+To send out email to users wanting to change their password, nodemailer is used. You can use your own choice of SMTP service but gmail is used by default and a link to how it's setup is specified in the .env file. To login with gmail OAuth2 is used with a refresh- and access-token.
+
+## Possible Feature Updates
+* Implement a none BOM destructive html parser
+* Use PM2 clusters to improve performance of server
+* Add custom PM2 metrics
+* Add websocket and email testing
+* Add SSL/TLS for websocket and HTTP requests
+* Create an admin panel to monitor and control the services
+* Use .ENV vault to store cross-service keys and secure values
+* Seperate the REST API and the signal API
+* Implement automatic serialization och creation of database
+* Migrate to a distributed database model
+* Automatically get email from websocket connection request and remove the field in WS requests
+* Add brute-force attack protection
+* Add a reverse-proxy with a balance loader (NGINX)
+* Improve SQL schematic for better field requirements
+* Implement docker for easier deployment
