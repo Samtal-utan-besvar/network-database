@@ -1,4 +1,4 @@
-const httpServer = require('../../main.js').httpServer;
+const httpServer = require('../../setup/main.js').httpServer;
 const chai = require('chai');
 const expect = chai.expect;
 const chaiHttp = require('chai-http');
@@ -11,8 +11,8 @@ const addContact = require('../unit/addContact');
 // Environment variables
 chai.use(chaiHttp);
 
-const userA = new user('Man', 'Yogurth', 'IsNice');
-const userB = new user('Almost', 'Finished', 'Beef');
+const userA = new user('Man', 'Yogurth', 'IsNasdasdice');
+const userB = new user('Almost', 'Finished', 'Beasdasdaef');
 
 /*
 NOTES FOR TESTING

@@ -134,6 +134,9 @@ function callResponse(conn, JSONMessage, clients) {
         if (JSONMessage['RESPONSE'] == 'accept') {
             clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] = JSONMessage['SENDER_PHONE_NUMBER']
             clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] = JSONMessage['RECEIVER_PHONE_NUMBER']
+        } else {
+            clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] = 'free'
+            clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] = 'free'
         }
         if (process.env.VERBOSE == 'true') console.log("COMMON: " + JSONMessage['SENDER_PHONE_NUMBER'] + " Answered " + JSONMessage['RECEIVER_PHONE_NUMBER'] + " Call Request With: " + JSONMessage['RESPONSE']);
     } catch (err) {

@@ -1,4 +1,4 @@
-const httpServer = require('../../main.js').httpServer;
+const httpServer = require('../../setup/main.js').httpServer;
 const assert = require('assert');
 const chai = require('chai');
 const expect = chai.expect;

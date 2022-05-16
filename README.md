@@ -112,6 +112,31 @@ Header (authorization): *(User's JWT token)*
     "phonenumber": "1313131313"
 }
 ```
+***
+#### Get Password Reset Email: *http://your_adress:8080/get_reset_password_code*
+```
+{
+    "email": "somenice@domain.yup"
+}
+```
+***
+#### Verify Reset Password Code: *http://your_adress:8080/verify_reset_password_code* (GET request)
+```
+{
+    "email": "somenice@domain.yup",
+    "verify_code": "EXAMPLE123"
+}
+```
+* Returns password reset token.
+***
+#### Modify Password: *http://your_adress:8080/put_password*
+Header (authorization): *(Password Reset Token)*
+```
+{
+    "email": "somenice@domain.yup",
+    "new_password": "betterPassword123"
+}
+```
 
 &nbsp;
 

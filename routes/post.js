@@ -30,6 +30,9 @@ function createUser(req, res, next) {
         // Check if email is valid format
         validate.validateEmail(email)
 
+        // Check if password is valid format
+        validate.validatePassword(password)
+
         // Check if email already exists (Async)
         const checkEmail = () => {
             return new Promise((resolve, reject) => {
