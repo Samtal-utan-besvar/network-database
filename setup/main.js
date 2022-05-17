@@ -23,7 +23,7 @@ _____/\\\\\\\\\\\____/\\\________/\\\__/\\\\\\\\\\\\\___
        _\///\\\\\\\\\\\/____\///\\\\\\\\\/___\/\\\\\\\\\\\\\/__
         ___\///////////________\/////////_____\/////////////____
 
-* Developed By PUM-8
+* Developed By PUM-8, Folke Johansson
 
 `
     // You're free to add to the credits if you inherit the project
