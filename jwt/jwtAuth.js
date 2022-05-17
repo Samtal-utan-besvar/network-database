@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { handleError, throwError } = require('../validation/validate');
 
 var tokenSecret;
-const tokenExpireTime = 604800;   // 1 week (seconds)
+const accessTokenExpireTime = 604800;   // 1 week (seconds)
 const resetTokenExpireTime = 300;    // 5 min
 
 // Read in the token secret from key
@@ -26,7 +26,7 @@ try {
 process.env.TOKEN_SECRET = tokenSecret;
 
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: tokenExpireTime + 's' });
+    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: accessTokenExpireTime + 's' });
 }
 
 function generatePasswordResetToken(payload) {
@@ -49,7 +49,7 @@ function authenticateToken(req, res, next) {
     })
 }
 
-// Asynchronous
+// Authenticate websocket token
 function authenticateWsToken(token, callback) {
     try {
         if (token == null) {

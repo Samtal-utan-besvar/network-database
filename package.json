@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "pm2 start init.js",
-    "test": "mocha ./tests/testManager.js --exit"
+    "test": "mocha ./tests/testManager.js --delay --exit"
   },
   "repository": {
     "type": "git",
