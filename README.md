@@ -34,7 +34,7 @@ When you have a key and the database is setup simply type ```npm start``` to sta
 To use the database and signal server, HTTP and websocket clients are required. It's highly recommended to use *Postman* to manually test the HTTP and websocket requests. Both servers use JSON as the dataformat to be sent and received.
 
 ### <ins>Databaseserver Communication</ins>
-#### Create a User: *http://your_adress:8080/create_user*
+#### Create a User: *http://your_adress:8080/create_user* (POST Request)
 ```
 {
     "firstname": "First",
@@ -45,7 +45,7 @@ To use the database and signal server, HTTP and websocket clients are required. 
 }
 ```
 ***
-#### Login a User: *http://your_adress:8080/login*
+#### Login a User: *http://your_adress:8080/login* (POST Request)
 ```
 {
     "email": "somenice@domain.yup",
@@ -54,14 +54,14 @@ To use the database and signal server, HTTP and websocket clients are required. 
 ```
 * Returns JWT token for future verification
 ***
-#### Authenticate a User: *http://your_adress:8080/authenticate*
+#### Authenticate a User: *http://your_adress:8080/authenticate* (GET Request)
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
 * Returns JWT token for future verification
 ***
-#### Add a Contact: *http://your_adress:8080/add_contact*
+#### Add a Contact: *http://your_adress:8080/add_contact* (POST Request)
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -69,21 +69,21 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Get User Data: *http://your_adress:8080/get_user*
+#### Get User Data: *http://your_adress:8080/get_user* (GET Request)
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
 * Returns users name, email and phone number
 ***
-#### Get Contacts: *http://your_adress:8080/get_contacts*
+#### Get Contacts: *http://your_adress:8080/get_contacts* (GET Request)
 Header (authorization): *(User's JWT token)*
 ```
 {}
 ```
 * Returns contacts in a list with their username, email and phone number
 ***
-#### Delete Contact: *http://your_adress:8080/delete_contact*
+#### Delete Contact: *http://your_adress:8080/delete_contact* (DELETE Request)
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -91,7 +91,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Modify Firstname: *http://your_adress:8080/put_firstname*
+#### Modify Firstname: *http://your_adress:8080/put_firstname* (PUT Request)
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -99,7 +99,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Modify Lastname: *http://your_adress:8080/put_lastname*
+#### Modify Lastname: *http://your_adress:8080/put_lastname* (PUT Request)
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -107,7 +107,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Modify Phonenumber: *http://your_adress:8080/put_phonenumber*
+#### Modify Phonenumber: *http://your_adress:8080/put_phonenumber* (PUT Request)
 Header (authorization): *(User's JWT token)*
 ```
 {
@@ -115,7 +115,7 @@ Header (authorization): *(User's JWT token)*
 }
 ```
 ***
-#### Get Password Reset Email: *http://your_adress:8080/get_reset_password_code*
+#### Get Password Reset Email: *http://your_adress:8080/get_reset_password_code* (GET Request)
 ```
 {
     "email": "somenice@domain.yup"
@@ -131,7 +131,7 @@ Header (authorization): *(User's JWT token)*
 ```
 * Returns password reset token.
 ***
-#### Modify Password: *http://your_adress:8080/put_password*
+#### Modify Password: *http://your_adress:8080/put_password* (PUT Request)
 Header (authorization): *(Password Reset Token)*
 ```
 {
