@@ -38,7 +38,7 @@ function putFirstname(req, res, next) {
             });
         }
 
-        // Make sure validity checks (async) are run before adding a contact. None currently
+        // Make sure validity checks (async) are run before updating the firstname. None currently
         putFirstnameRequest()
             .then(data => {
                 res.status(200).send('Firstname Modified!');
@@ -86,7 +86,7 @@ function putLastname(req, res, next) {
             });
         }
 
-        // Make sure validity checks (async) are run before adding a contact. None currently
+        // Make sure validity checks (async) are run before updating the lastname. None currently
         putLastnameRequest()
             .then(data => {
                 res.status(200).send('Lastname Modified!');
@@ -161,7 +161,7 @@ function putPhonenumber(req, res, next) {
             });
         }
 
-        // Make sure validity checks (async) are run before adding a contact. None currently
+        // Make sure validity checks (async) are run before updating the phonenumber
         checkPhonenumberExists()
             .then(data => {
                 putPhonenumberRequest()
@@ -257,7 +257,7 @@ function putPassword(req, res, next) {
             });
         }
 
-        // Make sure validity checks (async) are run before updating the password. None currently
+        // Make sure validity checks (async) are run before updating the password
         checkEmail()
             .then(data => {
                 if (verificationCodeManager.getVerifiedStatus(email)) {

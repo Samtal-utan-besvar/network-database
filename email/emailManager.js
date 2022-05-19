@@ -42,7 +42,12 @@ function createMessage(fromName, toEmail, subject, htmlObject) {
         from: fromName + ' <samtalutanbesvar@random.com>',
         to: 'Recipient <' + toEmail + '>',
         subject: subject,
-        html: htmlObject
+        html: htmlObject,
+        attachments: [{
+            filename: 'logo.png',
+            path: './pages/email/images/logo.png',
+            cid: 'logo'
+        }]
     };
 }
 

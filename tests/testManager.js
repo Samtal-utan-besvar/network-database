@@ -21,10 +21,6 @@ function runTests() {
     });
 }
 
-function isSetup() {
-    //runTests();
-}
-
 function importTest(name, path) {
     describe(name, function () {
         // Set a custom timeout message
@@ -44,16 +40,11 @@ function importTest(name, path) {
     });
 }
 
-main.subscribeIsSetup(isSetup);
-before(function (done) {
-    this.timeout(5000);
+// Run tests once setup
+main.subscribeIsSetup(run);
 
+// Setup services
+process.nextTick(function () {
     main.setupMain
-        .then(data => {
-            done();
-        })
-        .catch(err => {
-            handleError(err);
-        });
-});
+})
 runTests();
