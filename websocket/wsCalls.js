@@ -183,13 +183,6 @@ function hangUp(conn, JSONMessage, clients) {
         validate.validatePhonenumber(JSONMessage['RECEIVER_PHONE_NUMBER']);
         validate.validatePhonenumber(JSONMessage['SENDER_PHONE_NUMBER']);
 
-        if (clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['STATUS'] != JSONMessage['SENDER_PHONE_NUMBER'] ||
-            clients[JSONMessage['SENDER_PHONE_NUMBER']]['STATUS'] != JSONMessage['RECEIVER_PHONE_NUMBER']) {
-            var error = new Error('Caller or Contact Is Not in an Active Call');
-            error.name = 'Defined';
-            throw error;
-        }
-
         // Send message to the client with the phonenumber
         clients[JSONMessage['RECEIVER_PHONE_NUMBER']]['CONNECTION'].send(JSON.stringify(JSONMessage));
 
